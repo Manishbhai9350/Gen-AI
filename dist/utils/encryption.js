@@ -1,0 +1,9 @@
+import Cryptr from "cryptr";
+const cryptr = new Cryptr(process.env.ENCRYPTION_SECRET || "base-secret-9350");
+export const encrypt = (val) => {
+    return cryptr.encrypt(val);
+};
+export const decrypt = (val) => {
+    return cryptr.decrypt(val);
+};
+//# sourceMappingURL=encryption.js.map
