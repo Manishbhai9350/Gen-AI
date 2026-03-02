@@ -3,6 +3,7 @@ import { UserModel } from "../models/user.model.js";
 import { AppError } from "../middlewares/error.middleware.js";
 import { decrypt, encrypt } from "../utils/encryption.js";
 import { GenerateToken } from "../utils/jwt.js";
+import { BlackListModel } from "../models/blacklist.model.js";
 
 export const RegisterUserController = async (
   req: Request,
@@ -67,7 +68,7 @@ export const RegisterUserController = async (
   }
 };
 
-export const LoginController = async (
+export const LoginUserController = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -115,5 +116,38 @@ export const LoginController = async (
       });
   } catch (error) {
     next(error);
+  }
+};
+
+export const LogoutUserController = async (
+  req: Request,
+  res: Response,
+  next: Function,
+) => {
+  try {
+    const token = req.cookies["auth_token"] || req.headers?.authorization;
+
+    if (!token) {
+      return res.status(200).json({
+        message: "Already Logged Out",
+        success: true,
+      });
+    }
+
+    const blackListedToken = await BlackListModel.create({
+      token,
+    });
+
+    return res.status(200).cookie("auth_token", "").json({
+      message: "Logged Out Successfully",
+      success: true,
+    });
+  } catch (error: any) {
+    // Forward to centralized error handler
+    next(
+      error instanceof AppError
+        ? error
+        : new AppError(error.message || "Server Error", 500),
+    );
   }
 };

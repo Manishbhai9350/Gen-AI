@@ -2,6 +2,7 @@ import { UserModel } from "../models/user.model.js";
 import { AppError } from "../middlewares/error.middleware.js";
 import { decrypt, encrypt } from "../utils/encryption.js";
 import { GenerateToken } from "../utils/jwt.js";
+import { BlackListModel } from "../models/blacklist.model.js";
 export const RegisterUserController = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
@@ -50,7 +51,7 @@ export const RegisterUserController = async (req, res, next) => {
         next(error);
     }
 };
-export const LoginController = async (req, res, next) => {
+export const LoginUserController = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         // validation
@@ -86,6 +87,30 @@ export const LoginController = async (req, res, next) => {
     }
     catch (error) {
         next(error);
+    }
+};
+export const LogoutUserController = async (req, res, next) => {
+    try {
+        const token = req.cookies["auth_token"] || req.headers?.authorization;
+        if (!token) {
+            return res.status(200).json({
+                message: "Already Logged Out",
+                success: true,
+            });
+        }
+        const blackListedToken = await BlackListModel.create({
+            token,
+        });
+        return res.status(200).cookie("auth_token", "").json({
+            message: "Logged Out Successfully",
+            success: true,
+        });
+    }
+    catch (error) {
+        // Forward to centralized error handler
+        next(error instanceof AppError
+            ? error
+            : new AppError(error.message || "Server Error", 500));
     }
 };
 //# sourceMappingURL=auth.controller.js.map
