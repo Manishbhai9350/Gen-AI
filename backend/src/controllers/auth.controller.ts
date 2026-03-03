@@ -153,17 +153,17 @@ export const LogoutUserController = async (
 };
 
 export const GetUserController = async (
-  req: Request & {
-    user: { email: string; username: string; password: string; _id: string };
-  },
+  req: Request,
   res: Response,
-  next: NextFunction,
+  next: Function,
 ) => {
   try {
-    if (!req.user) {
+    const { user } = req as Request & {
+      user: { email: string; username: string; password: string; _id: string };
+    };
+    if (!user) {
       throw new Error("Unauthorized");
     }
-    const user = req.user;
 
     return res.status(200).json({
       success: true,

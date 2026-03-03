@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  GetUserController,
   LoginUserController,
   LogoutUserController,
   RegisterUserController,
@@ -14,6 +15,6 @@ const router = Router();
 router.post("/register", RegisterUserController);
 router.post("/login", LoginUserController);
 router.post("/logout", LogoutUserController);
-router.post("/me", BlackListMiddleware, AuthMiddleware, LogoutUserController);
+router.get("/me", BlackListMiddleware, AuthMiddleware, GetUserController);
 
 export { router as AuthRouter };
