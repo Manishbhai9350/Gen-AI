@@ -151,3 +151,34 @@ export const LogoutUserController = async (
     );
   }
 };
+
+export const GetUserController = async (
+  req: Request & {
+    user: { email: string; username: string; password: string; _id: string };
+  },
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (!req.user) {
+      throw new Error("Unauthorized");
+    }
+    const user = req.user;
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (error: any) {
+    // Forward to centralized error handler
+    next(
+      error instanceof AppError
+        ? error
+        : new AppError(error.message || "Server Error", 500),
+    );
+  }
+};
