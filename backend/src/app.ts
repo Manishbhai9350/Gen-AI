@@ -4,6 +4,9 @@ import { Connect } from "./config/db.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import CookieParser from "cookie-parser";
 import { AuthRouter } from "./routes/auth.route.js";
+import cors from "cors";
+import pinoHttp from "pino-http";
+
 
 configDotenv();
 
@@ -13,6 +16,14 @@ Connect();
 
 const PORT = process.env.PORT || 3000;
 
+app.use(pinoHttp());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  }),
+);
 app.use(express.json());
 app.use(CookieParser());
 app.use(urlencoded({ extended: true }));
