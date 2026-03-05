@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  color: #000;
 }
 
 .form-wrapper {
@@ -21,11 +22,12 @@
   transition: all 0.3s ease;
 }
 
-.form-card:hover {
-  transform: translateY(-3px);
-}
 
 .form-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
   text-align: center;
   font-size: 26px;
   font-weight: 600;
@@ -97,4 +99,14 @@
 
 .form-footer span:hover {
   text-decoration: underline;
+}
+
+.logo {
+  height: 30px;
+  width: 30px;
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
 }
