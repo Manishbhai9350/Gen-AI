@@ -167,6 +167,7 @@ export const GetUserController = async (
 
     return res.status(200).json({
       success: true,
+      isLoggedIn: true,
       user: {
         id: user._id,
         username: user.username,

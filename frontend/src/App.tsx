@@ -1,16 +1,42 @@
-import "./App.scss";
 import { Route, Routes } from "react-router-dom";
-import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
+import AuthenticatedRoute from "./components/auth/authenticated.route";
+import { Toaster } from "react-hot-toast";
+import Dashboard from "./pages/Dashboard";
+import UnAuthenticatedRoute from "./components/auth/unauthenticated.route";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-    </Routes>
+    <>
+      <Toaster position="bottom-center" />
+      <Routes>
+        <Route
+          path="/dashboard"
+          element={
+            <AuthenticatedRoute>
+              <Dashboard />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <UnAuthenticatedRoute>
+              <Login />
+            </UnAuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <UnAuthenticatedRoute>
+              <Signup />
+            </UnAuthenticatedRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 

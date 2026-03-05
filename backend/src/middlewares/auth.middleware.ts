@@ -13,19 +13,31 @@ export const AuthMiddleware = async (
     const token = req.cookies["auth_token"] || null;
 
     if (!token) {
-      throw new Error("Please Login first!");
+      return res.status(200).json({
+        message: "Please Loggin",
+        success: true,
+        isLoggedIn: false,
+      });
     }
 
     const decoded = DecodeToken(token);
 
     if (!decoded) {
-      throw new Error("Please Login first!");
+      return res.status(200).json({
+        message: "Please Loggin",
+        success: true,
+        isLoggedIn: false,
+      });
     }
 
     const user = await UserModel.findOne({ _id: decoded.id });
 
     if (!user) {
-      throw new Error("Please Login first!");
+      return res.status(200).json({
+        message: "Please Loggin",
+        success: true,
+        isLoggedIn: false,
+      });
     }
 
     req.user = user;
@@ -53,6 +65,7 @@ export const BlackListMiddleware = async (
       return res.status(200).json({
         message: "Please Loggin",
         success: true,
+        isLoggedIn: false,
       });
     }
 
@@ -64,6 +77,7 @@ export const BlackListMiddleware = async (
       return res.status(400).cookie("auth_token", "").json({
         message: "Error Blacklisted Token, Loggin Again",
         success: false,
+        isLoggedIn: false,
       });
     }
 

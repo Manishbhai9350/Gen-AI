@@ -1,18 +1,11 @@
 import React, { useState } from "react";
 import "./scss/form.scss";
-import axiosInstance from "../../../utils/axios/axios";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../../../features/user/hooks/user.hooks";
+import toast from "react-hot-toast";
 
 interface FormProps {
   type?: "login" | "signup";
-}
-
-interface Errors {
-  username?: string;
-  email?: string;
-  password?: string;
-  confirmPass?: string;
-  server?: string;
 }
 
 const Form = ({ type = "signup" }: FormProps) => {
@@ -21,69 +14,44 @@ const Form = ({ type = "signup" }: FormProps) => {
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
 
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Errors>({});
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
+  const { login, register, loading, errors } = useUser();
 
-  const validate = () => {
-    const newErrors: Errors = {};
-
-    if (type === "signup" && !username.trim()) {
-      newErrors.username = "Username is required";
-    }
-
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    }
-
-    if (!password.trim()) {
-      newErrors.password = "Password is required";
-    }
-
-    if (type === "signup" && password !== confirmPass) {
-      newErrors.confirmPass = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function OnSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!validate()) return;
-
-    try {
-      setLoading(true);
-      setErrors({});
-
-      const payload =
-        type === "signup"
-          ? { email, password, username }
-          : { email, password };
-
-      const endpoint = type === "signup" ? "/auth/register" : "/auth/login";
-
-      const response = await axiosInstance.post(endpoint, payload);
-      const { data } = response.data;
-
-      if(response.data.success) {
-        navigate('/')
-      }
-
-      console.log(response.data);
-    } catch (err: any) {
-      setErrors({
-        server:
-          err?.response?.data?.message ||
-          "Something went wrong. Please try again.",
-      });
-    } finally {
-      setLoading(false);
+    if (type === "signup") {
+      register(
+        { username, email, password, confirmPass },
+        {
+          onSuccess: () => {
+            toast.success("Signed Up Successfully");
+            navigate("/dashboard");
+          },
+          onError() {
+            toast.error("Failed to Signup");
+          },
+        },
+      );
+    } else {
+      login(
+        { email, password },
+        {
+          onSuccess: () => {
+            toast.success("Logged In Successfully");
+            navigate("/dashboard");
+          },
+          onError: () => {
+            toast.error("Failed to Login");
+          },
+          onFinished: () => {
+            console.log("Request finished");
+          },
+        },
+      );
     }
   }
-
   // pass -> cheetah_9350_meow
 
   return (
@@ -96,7 +64,7 @@ const Form = ({ type = "signup" }: FormProps) => {
           {type === "login" ? "Welcome Back" : "Create Account"}
         </h2>
 
-        <form className="form" onSubmit={onSubmit}>
+        <form className="form" onSubmit={OnSubmit}>
           {type === "signup" && (
             <div className="input-group">
               <label htmlFor="username">Username</label>
@@ -107,7 +75,9 @@ const Form = ({ type = "signup" }: FormProps) => {
                 id="username"
                 placeholder="Enter username"
               />
-              {errors.username && <span className="error">{errors.username}</span>}
+              {errors.username && (
+                <span className="error">{errors.username}</span>
+              )}
             </div>
           )}
 
@@ -132,7 +102,9 @@ const Form = ({ type = "signup" }: FormProps) => {
               id="password"
               placeholder="Enter password"
             />
-            {errors.password && <span className="error">{errors.password}</span>}
+            {errors.password && (
+              <span className="error">{errors.password}</span>
+            )}
           </div>
 
           {type === "signup" && (
@@ -153,12 +125,12 @@ const Form = ({ type = "signup" }: FormProps) => {
 
           {errors.server && <div className="server-error">{errors.server}</div>}
 
-          <button disabled={loading} style={{opacity:loading ? .5 : 1}} className="submit-btn">
-            {loading
-              ? "Loading..."
-              : type === "login"
-              ? "Login"
-              : "Sign Up"}
+          <button
+            disabled={loading}
+            style={{ opacity: loading ? 0.5 : 1 }}
+            className="submit-btn"
+          >
+            {loading ? "Loading..." : type === "login" ? "Login" : "Sign Up"}
           </button>
 
           <p className="form-footer">
