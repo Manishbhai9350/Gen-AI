@@ -71,7 +71,7 @@ const InterviewReportSchema = new Schema<InterviewReport>(
 
     skillGaps: [SkillGapSchema],
 
-    preparationPlan: PreparationPlanSchema,
+    preparationPlan: [PreparationPlanSchema],
 
     sectionScores: {
       technical: Number,

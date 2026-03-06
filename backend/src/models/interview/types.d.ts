@@ -63,7 +63,7 @@ declare global {
 
     skillGaps: SkillGap[];
 
-    preparationPlan?: PreparationPlan;
+    preparationPlan?: PreparationPlan[];
 
     sectionScores?: SectionScores;
 
