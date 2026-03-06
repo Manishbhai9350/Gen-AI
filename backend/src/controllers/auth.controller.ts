@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
-import { UserModel } from "../models/user.model.js";
 import { AppError } from "../middlewares/error.middleware.js";
 import { decrypt, encrypt } from "../utils/encryption.js";
 import { GenerateToken } from "../utils/jwt.js";
-import { BlackListModel } from "../models/blacklist.model.js";
+import { UserModel } from "../models/user/user.model.js";
+import { BlackListModel } from "../models/blacklist/blacklist.model.js";
 
 export const RegisterUserController = async (
   req: Request,

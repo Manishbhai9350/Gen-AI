@@ -1,9 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { DecodeToken } from "../utils/jwt.js";
 import { AppError } from "./error.middleware.js";
-import { UserModel } from "../models/user.model.js";
-import { BlackListModel } from "../models/blacklist.model.js";
-
+import { UserModel } from "../models/user/user.model.js";
+import { BlackListModel } from "../models/blacklist/blacklist.model.js";
 export const AuthMiddleware = async (
   req: Request & { user?: any },
   res: Response,
