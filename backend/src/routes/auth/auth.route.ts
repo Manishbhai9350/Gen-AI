@@ -4,11 +4,11 @@ import {
   LoginUserController,
   LogoutUserController,
   RegisterUserController,
-} from "../controllers/auth.controller.js";
+} from "../../controllers/auth/auth.controller.js";
 import {
   AuthMiddleware,
   BlackListMiddleware,
-} from "../middlewares/auth.middleware.js";
+} from "../../middlewares/auth.middleware.js";
 
 const router = Router();
 

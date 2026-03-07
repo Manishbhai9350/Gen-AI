@@ -3,7 +3,7 @@ import express, { urlencoded } from "express";
 import { Connect } from "./config/db.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import CookieParser from "cookie-parser";
-import { AuthRouter } from "./routes/auth.route.js";
+import { AuthRouter } from "./routes/auth/auth.route.js";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";

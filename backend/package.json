@@ -21,15 +21,21 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.58",
+    "@ai-sdk/deepseek": "^2.0.24",
     "@ai-sdk/google": "^3.0.43",
+    "@ai-sdk/groq": "^3.0.29",
+    "@ai-sdk/openai": "^3.0.41",
     "ai": "^6.0.69",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "cryptr": "^6.4.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "install": "^0.13.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.3",
+    "npm": "^11.11.0",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0"
   }
