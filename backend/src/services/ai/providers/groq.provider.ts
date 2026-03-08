@@ -1,15 +1,18 @@
-import OpenAI from "openai";
+import { generateText } from "ai";
+import { createGroq } from "@ai-sdk/groq";
 
-const client = new OpenAI({
-  baseURL: "https://api.groq.com/openai/v1",
-  apiKey: process.env.GROQ_API_KEY,
+const groq = createGroq({
+  apiKey: process.env.GROQ_API_KEY as string,
 });
 
-export const generateGroq = async (model: string, prompt: string) => {
-  const completion = await client.chat.completions.create({
-    model,
-    messages: [{ role: "user", content: prompt }],
+export const generateGroq = async (
+  model: string,
+  prompt: string
+): Promise<string> => {
+  const { text } = await generateText({
+    model: groq(model),
+    prompt,
   });
 
-  return completion.choices[0].message.content;
+  return text;
 };

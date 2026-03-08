@@ -1,15 +1,19 @@
+import { generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 
-const client = new createOpenAI({
-  apiKey: process.env.OPENAI_CREDENTIAL_KEY as String,
+const openai = createOpenAI({
+  apiKey: process.env.OPENAI_API_KEY as string,
 });
 
-export const generateOpenAI = async (model: string, prompt: string) => {
-  const completion = await client.chat.completions.create({
-    model,
-    messages: [{ role: "user", content: prompt }],
+export const generateOpenAI = async (
+  model: string,
+  prompt: string,
+): Promise<string> => {
+  const { text } = await generateText({
+    model: openai(model),
+    prompt,
     temperature: 0.7,
   });
 
-  return completion.choices[0].message.content;
+  return text;
 };

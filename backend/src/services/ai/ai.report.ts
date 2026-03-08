@@ -1,28 +1,34 @@
-import { AI_MODELS } from "../../config/ai.config";
-import { buildInterviewPrompt } from "../../utils/prompts/interview.prompt";
-import { runAI } from "./ai-router";
-import { InterviewReportModel } from "../../models/interview/interview.model";
+import { InterviewReportModel } from "../../models/interview/interview.report.model.js";
+import { buildInterviewPrompt } from "../../utils/ai.prompt.js";
+import { AI_MODELS, type AIProvider } from "./ai.models.js";
+import { runAI } from "./ai.router.js";
 
 interface AiReportInput {
   resume: string;
   jobDescription: string;
   userDescription: string;
-  modelKey: string;
+  ai_provider: AIProvider;
+  ai_model: string;
 }
 
 export const AiReport = async ({
   resume,
   jobDescription,
   userDescription,
-  modelKey,
+  ai_provider,
+  ai_model,
 }: AiReportInput) => {
-  const config = AI_MODELS[modelKey];
+  const config = AI_MODELS[ai_provider];
 
-  if (!config) throw new Error("Invalid AI model");
+  if (!config) throw new Error("Invalid AI Provider");
 
   const prompt = buildInterviewPrompt(resume, jobDescription, userDescription);
 
-  const aiResponse = await runAI(config.provider, config.model, prompt);
+  const model = config.models.find((m) => m.model == ai_model);
+
+  if (!model || !model.enabled) throw new Error("Invalid AI model");
+
+  const aiResponse = await runAI(config.provider, model.model, prompt);
 
   let reportData;
 
@@ -32,16 +38,7 @@ export const AiReport = async ({
     throw new Error("AI returned invalid JSON");
   }
 
-  const report = await InterviewReportModel.create({
-    resume,
-    jobDescription,
-    userDescription,
-    ...reportData,
-    ai: {
-      provider: config.provider,
-      model: config.model,
-    },
-  });
+  
 
-  return report;
+  return reportData;
 };

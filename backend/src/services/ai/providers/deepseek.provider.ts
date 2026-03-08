@@ -1,15 +1,18 @@
-import OpenAI from "openai";
+import { generateText } from "ai";
+import { createDeepSeek } from "@ai-sdk/deepseek";
 
-const client = new OpenAI({
-  baseURL: "https://api.deepseek.com",
-  apiKey: process.env.DEEPSEEK_API_KEY,
+const deepseek = createDeepSeek({
+  apiKey: process.env.DEEPSEEK_API_KEY as string,
 });
 
-export const generateDeepSeek = async (model: string, prompt: string) => {
-  const completion = await client.chat.completions.create({
-    model,
-    messages: [{ role: "user", content: prompt }],
+export const generateDeepseek = async (
+  model: string,
+  prompt: string,
+): Promise<string> => {
+  const { text } = await generateText({
+    model: deepseek(model),
+    prompt,
   });
 
-  return completion.choices[0].message.content;
+  return text;
 };
