@@ -9,10 +9,11 @@ export const InterviewReportController = async (
   next: NextFunction,
 ) => {
   try {
-    const { resume, jobDescription, userDescription, ai_model, ai_provider } =
+    const { jobDescription, userDescription, ai_model, ai_provider } =
       req.body;
 
     const { user } = req as Request & { user?: { _id: string } };
+
 
     if (!user) {``
       throw new Error("Unauthenticated");
@@ -43,7 +44,7 @@ export const InterviewReportController = async (
 
     const report = await InterviewReportModel.create({
       user: user._id,
-      resume,
+      resume:ResumeText,
       jobDescription,
       userDescription,
       ...AiReportData,
@@ -55,7 +56,6 @@ export const InterviewReportController = async (
 
     res.status(200).json({
       success: true,
-      resumeText: ResumeText,
       report,
     });
   } catch (error) {

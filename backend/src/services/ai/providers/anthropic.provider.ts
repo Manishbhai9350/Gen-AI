@@ -1,5 +1,6 @@
-import { generateText } from "ai";
+import { generateText, Output } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
+import { ResumeAnalysisSchema } from "../schema.js";
 
 const anthropic = createAnthropic({
   apiKey: process.env.ANTHROPIC_API_KEY as string,
@@ -7,10 +8,13 @@ const anthropic = createAnthropic({
 
 export const generateAnthropic = async (
   model: string,
-  prompt: string
+  prompt: string,
 ): Promise<string> => {
   const { text } = await generateText({
     model: anthropic(model),
+    output: Output.object({
+      schema: ResumeAnalysisSchema,
+    }),
     prompt,
   });
 

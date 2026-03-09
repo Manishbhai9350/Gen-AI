@@ -14,16 +14,4 @@ ${jobDescription}
 Candidate Description:
 ${userDescription}
 
-Return ONLY valid JSON with this structure:
-
-{
-  "technicalQuestions": [],
-  "behavioralQuestions": [],
-  "skillGaps": [],
-  "preparationPlan": {},
-  "sectionScores": {},
-  "overallScore": 0,
-  "strengths": [],
-  "improvements": []
-}
 `;

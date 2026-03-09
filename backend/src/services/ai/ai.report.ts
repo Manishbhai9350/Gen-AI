@@ -26,7 +26,10 @@ export const AiReport = async ({
 
   const model = config.models.find((m) => m.model == ai_model);
 
-  if (!model || !model.enabled) throw new Error("Invalid AI model");
+  if (!model) throw new Error("Invalid AI model");
+
+  if (!model.enabled)
+    throw new Error(model.model + " AI Model is currently unavailable");
 
   const aiResponse = await runAI(config.provider, model.model, prompt);
 
@@ -37,8 +40,6 @@ export const AiReport = async ({
   } catch {
     throw new Error("AI returned invalid JSON");
   }
-
-  
 
   return reportData;
 };

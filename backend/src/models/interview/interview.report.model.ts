@@ -1,51 +1,76 @@
 import mongoose, { Schema, model } from "mongoose";
 
-const QuestionSchema = new Schema<Question>({
-  question: { type: String, required: true },
-  expectedAnswer: String,
-  userAnswer: String,
-  difficulty: {
-    type: String,
-    enum: ["easy", "medium", "hard"],
+const QuestionSchema = new Schema<Question>(
+  {
+    question: { type: String, required: true },
+    expectedAnswer: String,
+    userAnswer: String,
+    difficulty: {
+      type: String,
+      enum: ["easy", "medium", "hard"],
+    },
+    score: {
+      type: Number,
+      min: 0,
+      max: 10,
+    },
+    feedback: String,
+    tags: [String],
   },
-  score: {
-    type: Number,
-    min: 0,
-    max: 10,
+  {
+    _id: false,
   },
-  feedback: String,
-  tags: [String],
-});
+);
 
-const SkillGapSchema = new Schema<SkillGap>({
-  skill: { type: String, required: true },
-  severity: {
-    type: String,
-    enum: ["low", "medium", "high"],
-    required: true,
+const SkillGapSchema = new Schema<SkillGap>(
+  {
+    skill: { type: String, required: true },
+    severity: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      required: true,
+    },
+    explanation: String,
+    resources: [String],
   },
-  explanation: String,
-  resources: [String],
-});
-
-const DailyTaskSchema = new Schema<DailyTask>({
-  task: String,
-  completed: {
-    type: Boolean,
-    default: false,
+  {
+    _id: false,
   },
-});
+);
 
-const PreparationDaySchema = new Schema<PreparationDay>({
-  day: Number,
-  focus: String,
-  tasks: [DailyTaskSchema],
-});
+const DailyTaskSchema = new Schema<DailyTask>(
+  {
+    task: String,
+    completed: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    _id: false,
+  },
+);
 
-const PreparationPlanSchema = new Schema<PreparationPlan>({
-  totalDays: Number,
-  plan: [PreparationDaySchema],
-});
+const PreparationDaySchema = new Schema<PreparationDay>(
+  {
+    day: Number,
+    focus: String,
+    tasks: [DailyTaskSchema],
+  },
+  {
+    _id: false,
+  },
+);
+
+const PreparationPlanSchema = new Schema<PreparationPlan>(
+  {
+    totalDays: Number,
+    plan: [PreparationDaySchema],
+  },
+  {
+    _id: false,
+  },
+);
 
 const AISchema = new Schema<AIInfo>({
   provider: String,
