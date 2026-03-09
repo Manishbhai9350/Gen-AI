@@ -1,106 +1,245 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap");
+
+// ── Variables ────────────────────────────────────────────────────────────────
+$bg: #262624;
+$bg-card: #2f2f2c;
+$bg-card-hover: #353532;
+$bg-inset: #1e1e1c;
+$border: rgba(255, 255, 255, 0.07);
+$border-bright: rgba(255, 255, 255, 0.13);
+$text: #fff;
+$text-muted: rgba(255, 255, 255, 0.45);
+$text-secondary: rgba(255, 255, 255, 0.7);
+$accent: #e8ff47;
+$accent-dim: rgba(232, 255, 71, 0.12);
+$accent-border: rgba(232, 255, 71, 0.3);
+$green: #4ade80;
+$green-dim: rgba(74, 222, 128, 0.1);
+$red: #f87171;
+$red-dim: rgba(248, 113, 113, 0.1);
+$amber: #fbbf24;
+$amber-dim: rgba(251, 191, 36, 0.1);
+$blue: #60a5fa;
+$blue-dim: rgba(96, 165, 250, 0.1);
+$purple: #a78bfa;
+$purple-dim: rgba(167, 139, 250, 0.1);
+$radius-sm: 8px;
+$radius: 14px;
+$mono: "Space Mono", monospace;
+$sans: "DM Sans", sans-serif;
+
+// ── Wrapper ──────────────────────────────────────────────────────────────────
 .form-wrapper {
   min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: var(--bg-primary);
-  font-family: "Inter", sans-serif;
+  justify-content: center;
+  background-color: $bg;
+  background-image:
+    radial-gradient(ellipse 60% 50% at 50% -10%, rgba(232, 255, 71, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 90%, rgba(96, 165, 250, 0.04) 0%, transparent 60%);
+  font-family: $sans;
+  padding: 24px;
 }
 
+// ── Card ─────────────────────────────────────────────────────────────────────
 .form-card {
-  width: 380px;
-  padding: 40px;
-  background: var(--bg-primary);
-  border: 1px solid #e5e5e5;
-  border-radius: 14px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 420px;
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  padding: 40px 36px;
+  box-shadow:
+    0 0 0 1px $border,
+    0 24px 48px rgba(0, 0, 0, 0.35),
+    0 8px 16px rgba(0, 0, 0, 0.2);
+
+  animation: cardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes cardIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
+// ── Title ─────────────────────────────────────────────────────────────────────
 .form-title {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  text-align: center;
-  font-size: 26px;
+  gap: 14px;
+  font-family: $sans;
+  font-size: 22px;
   font-weight: 600;
-  margin-bottom: 30px;
-  color: var(--text-primary);
+  color: $text;
+  text-align: center;
+  margin: 0 0 32px;
+  letter-spacing: -0.3px;
+
+  .logo {
+    width: 44px;
+    height: 44px;
+    background: $accent-dim;
+    border: 1px solid $accent-border;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+  }
 }
 
+// ── Form ──────────────────────────────────────────────────────────────────────
 .form {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
+// ── Input Group ───────────────────────────────────────────────────────────────
 .input-group {
   display: flex;
   flex-direction: column;
-}
+  gap: 7px;
 
-.input-group label {
-  font-size: 13px;
-  margin-bottom: 6px;
-  color: #444;
-}
+  label {
+    font-family: $mono;
+    font-size: 11px;
+    font-weight: 400;
+    color: $text-muted;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
 
-.input-group input {
-  padding: 12px 14px;
-  border-radius: 8px;
-  border: 1px solid #dcdcdc;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.25s ease;
-}
-
-.input-group input:focus {
-  border-color: #000;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
-}
-
-.submit-btn {
-  margin-top: 10px;
-  padding: 13px;
-  border-radius: 8px;
-  border: none;
-  background: #000;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.submit-btn:hover {
-  background: #1a1a1a;
-}
-
-.form-footer {
-  margin-top: 12px;
-  text-align: center;
-  font-size: 13px;
-  color: #666;
-}
-
-.form-footer span {
-  color: #000;
-  font-weight: 500;
-  cursor: pointer;
-  margin-left: 5px;
-}
-
-.form-footer span:hover {
-  text-decoration: underline;
-}
-
-.logo {
-  height: 30px;
-  width: 30px;
-  img {
-    height: 100%;
+  input {
     width: 100%;
-    object-fit: cover;
+    background: $bg-inset;
+    border: 1px solid $border-bright;
+    border-radius: $radius-sm;
+    padding: 11px 14px;
+    font-family: $sans;
+    font-size: 14px;
+    font-weight: 400;
+    color: $text;
+    outline: none;
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease,
+      background 0.18s ease;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $text-muted;
+    }
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    &:focus {
+      border-color: $accent-border;
+      background: lighten(#1e1e1c, 1.5%);
+      box-shadow:
+        0 0 0 3px $accent-dim,
+        inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .error {
+    font-family: $mono;
+    font-size: 11px;
+    color: $red;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    &::before {
+      content: "✕";
+      font-size: 9px;
+    }
+  }
+}
+
+// ── Server Error ──────────────────────────────────────────────────────────────
+.server-error {
+  background: $red-dim;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: $radius-sm;
+  padding: 10px 14px;
+  font-family: $sans;
+  font-size: 13px;
+  color: $red;
+  text-align: center;
+}
+
+// ── Submit Button ─────────────────────────────────────────────────────────────
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 4px;
+  background: $accent;
+  color: #1a1a18;
+  border: none;
+  border-radius: $radius-sm;
+  font-family: $mono;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    transform 0.15s ease,
+    box-shadow 0.18s ease;
+  box-shadow: 0 2px 12px rgba(232, 255, 71, 0.2);
+
+  &:hover:not(:disabled) {
+    background: lighten(#e8ff47, 6%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(232, 255, 71, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 6px rgba(232, 255, 71, 0.15);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.form-footer {
+  font-family: $sans;
+  font-size: 13px;
+  color: $text-muted;
+  text-align: center;
+  margin: 0;
+
+  a {
+    color: $accent;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.8;
+    }
   }
 }

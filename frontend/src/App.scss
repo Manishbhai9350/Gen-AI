@@ -1,13 +1,41 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap");
+
+// ── Variables ────────────────────────────────────────────────────────────────
+$bg: #262624;
+$bg-card: #2f2f2c;
+$bg-card-hover: #353532;
+$bg-inset: #1e1e1c;
+$border: rgba(255, 255, 255, 0.07);
+$border-bright: rgba(255, 255, 255, 0.13);
+$text: #fff;
+$text-muted: rgba(255, 255, 255, 0.45);
+$text-secondary: rgba(255, 255, 255, 0.7);
+
+$accent: #e8ff47;
+$accent-dim: rgba(232, 255, 71, 0.12);
+$accent-border: rgba(232, 255, 71, 0.3);
+
+$green: #4ade80;
+$green-dim: rgba(74, 222, 128, 0.1);
+$red: #f87171;
+$red-dim: rgba(248, 113, 113, 0.1);
+$amber: #fbbf24;
+$amber-dim: rgba(251, 191, 36, 0.1);
+$blue: #60a5fa;
+$blue-dim: rgba(96, 165, 250, 0.1);
+$purple: #a78bfa;
+$purple-dim: rgba(167, 139, 250, 0.1);
+
+$radius-sm: 8px;
+$radius: 14px;
+$mono: "Space Mono", monospace;
+$sans: "DM Sans", sans-serif;
+
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
-}
-
-:root {
-  --bg-primary: #f4f4f4;
-  --text-primary: #111;
 }
 
 html,

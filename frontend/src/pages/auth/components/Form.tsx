@@ -52,7 +52,7 @@ const Form = ({ type = "signup" }: FormProps) => {
       );
     }
   }
-  // pass -> cheetah_9350_meow
+  // pass -> cheetah_9350
 
   return (
     <div className="form-wrapper">
