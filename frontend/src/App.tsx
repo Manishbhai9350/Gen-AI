@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import Dashboard from "./pages/Dashboard";
 import UnAuthenticatedRoute from "./components/auth/unauthenticated.route";
 import InterviewPage from "./pages/Interview/Interview";
+import NewInterviewPage from "./pages/Interview/NewInterview";
 
 function App() {
   return (
@@ -41,6 +42,14 @@ function App() {
           element={
             <AuthenticatedRoute>
               <InterviewPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/interview/new"
+          element={
+            <AuthenticatedRoute>
+              <NewInterviewPage />
             </AuthenticatedRoute>
           }
         />

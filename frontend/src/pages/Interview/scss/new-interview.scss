@@ -1,0 +1,643 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap");
+
+// ── Variables ────────────────────────────────────────────────────────────────
+$bg: #262624;
+$bg-card: #2f2f2c;
+$bg-card-hover: #353532;
+$bg-inset: #1e1e1c;
+$border: rgba(255, 255, 255, 0.07);
+$border-bright: rgba(255, 255, 255, 0.13);
+$text: #fff;
+$text-muted: rgba(255, 255, 255, 0.45);
+$text-secondary: rgba(255, 255, 255, 0.7);
+$accent: #e8ff47;
+$accent-dim: rgba(232, 255, 71, 0.12);
+$accent-border: rgba(232, 255, 71, 0.3);
+$green: #4ade80;
+$green-dim: rgba(74, 222, 128, 0.1);
+$red: #f87171;
+$red-dim: rgba(248, 113, 113, 0.1);
+$radius-sm: 8px;
+$radius: 14px;
+$mono: "Space Mono", monospace;
+$sans: "DM Sans", sans-serif;
+
+// ── Keyframes ────────────────────────────────────────────────────────────────
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.9); opacity: 0.6; }
+  50%  { transform: scale(1.1); opacity: 0.2; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+@keyframes stepFadeIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}
+
+// ── Wrapper ──────────────────────────────────────────────────────────────────
+.ni-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background-color: $bg;
+  font-family: $sans;
+  padding: 48px 24px 80px;
+  overflow-x: hidden;
+}
+
+// ── Background glows ─────────────────────────────────────────────────────────
+.ni-bg-glow {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+
+  &--top {
+    top: -160px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse at center, rgba(232, 255, 71, 0.055) 0%, transparent 70%);
+  }
+
+  &--bottom {
+    bottom: -200px;
+    right: -100px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(ellipse at center, rgba(96, 165, 250, 0.04) 0%, transparent 70%);
+  }
+}
+
+// ── Container ────────────────────────────────────────────────────────────────
+.ni-container {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+// ── Header ───────────────────────────────────────────────────────────────────
+.ni-header {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: $accent-dim;
+    border: 1px solid $accent-border;
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-family: $mono;
+    font-size: 11px;
+    color: $accent;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: $accent;
+      animation: dot-pulse 1.8s ease-in-out infinite;
+    }
+  }
+
+  &__title {
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 600;
+    color: $text;
+    letter-spacing: -0.5px;
+    margin: 0 0 12px;
+    line-height: 1.2;
+  }
+
+  &__sub {
+    font-size: 15px;
+    color: $text-muted;
+    line-height: 1.6;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+}
+
+// ── Step indicator ───────────────────────────────────────────────────────────
+.ni-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 44px;
+  animation: fadeUp 0.5s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: $accent-dim;
+    border: 1px solid $accent-border;
+    color: $accent;
+    font-family: $mono;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__label {
+    font-family: $mono;
+    font-size: 11px;
+    color: $text-secondary;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  &__line {
+    width: 40px;
+    height: 1px;
+    background: $border-bright;
+    margin: 0 12px;
+  }
+}
+
+// ── Form ─────────────────────────────────────────────────────────────────────
+.ni-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+// ── Section ──────────────────────────────────────────────────────────────────
+.ni-section {
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  padding: 28px;
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @for $i from 1 through 3 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 0.08}s; }
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  &__num {
+    font-family: $mono;
+    font-size: 11px;
+    color: $accent;
+    letter-spacing: 0.06em;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: $text;
+    margin: 0 0 4px;
+  }
+
+  &__desc {
+    font-size: 12px;
+    color: $text-muted;
+    margin: 0;
+  }
+}
+
+// ── Dropzone ─────────────────────────────────────────────────────────────────
+.ni-dropzone {
+  border: 1.5px dashed $border-bright;
+  border-radius: $radius-sm;
+  background: $bg-inset;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  min-height: 148px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: lighten(#1e1e1c, 1%);
+  }
+
+  // ── Dragging state ──
+  &--dragging {
+    border-color: $accent-border;
+    background: $accent-dim;
+    box-shadow: 0 0 0 3px rgba(232, 255, 71, 0.08), inset 0 0 24px rgba(232, 255, 71, 0.04);
+    cursor: copy;
+
+    .ni-dropzone__icon {
+      color: $accent;
+      transform: scale(1.15) translateY(-3px);
+    }
+
+    .ni-dropzone__text {
+      color: $accent;
+    }
+  }
+
+  // ── Uploaded state ──
+  &--uploaded {
+    border-style: solid;
+    border-color: rgba(74, 222, 128, 0.35);
+    background: rgba(74, 222, 128, 0.04);
+    cursor: default;
+  }
+
+  // ── Empty inner ──
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 32px 24px;
+    width: 100%;
+    text-align: center;
+  }
+
+  &__icon {
+    color: $text-muted;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  &__text {
+    font-size: 14px;
+    color: $text-secondary;
+    transition: color 0.2s ease;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  &__or {
+    font-family: $mono;
+    font-size: 10px;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  &__browse {
+    background: transparent;
+    border: 1px solid $border-bright;
+    border-radius: $radius-sm;
+    padding: 7px 18px;
+    font-family: $mono;
+    font-size: 11px;
+    color: $text-secondary;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+
+    &:hover {
+      border-color: $accent-border;
+      color: $accent;
+      background: $accent-dim;
+    }
+  }
+
+  // ── File preview ──
+  &__file {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    width: 100%;
+  }
+
+  &__file-icon {
+    width: 48px;
+    height: 52px;
+    background: $accent-dim;
+    border: 1px solid $accent-border;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    .file-ext {
+      font-family: $mono;
+      font-size: 10px;
+      font-weight: 700;
+      color: $accent;
+      letter-spacing: 0.04em;
+    }
+  }
+
+  &__file-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .file-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: $text;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-size {
+      font-family: $mono;
+      font-size: 11px;
+      color: $text-muted;
+    }
+  }
+
+  &__remove {
+    background: transparent;
+    border: 1px solid $border-bright;
+    border-radius: $radius-sm;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-muted;
+    font-size: 11px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+
+    &:hover {
+      border-color: rgba(248, 113, 113, 0.4);
+      color: $red;
+      background: $red-dim;
+    }
+  }
+}
+
+// ── Textarea ─────────────────────────────────────────────────────────────────
+.ni-textarea-wrap {
+  position: relative;
+
+  &--error .ni-textarea {
+    border-color: rgba(248, 113, 113, 0.4);
+
+    &:focus {
+      border-color: rgba(248, 113, 113, 0.6);
+      box-shadow: 0 0 0 3px $red-dim;
+    }
+  }
+}
+
+.ni-textarea {
+  width: 100%;
+  background: $bg-inset;
+  border: 1px solid $border-bright;
+  border-radius: $radius-sm;
+  padding: 14px 16px 36px;
+  font-family: $sans;
+  font-size: 14px;
+  line-height: 1.6;
+  color: $text;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $text-muted;
+    line-height: 1.6;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  &:focus {
+    border-color: $accent-border;
+    box-shadow: 0 0 0 3px $accent-dim;
+  }
+}
+
+.ni-textarea__counter {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  font-family: $mono;
+  font-size: 10px;
+  color: $text-muted;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+// ── Error text ───────────────────────────────────────────────────────────────
+.ni-error {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: $mono;
+  font-size: 11px;
+  color: $red;
+  margin-top: 8px;
+
+  &::before {
+    content: "✕";
+    font-size: 9px;
+  }
+}
+
+// ── Submit ───────────────────────────────────────────────────────────────────
+.ni-submit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding-top: 8px;
+  animation: fadeUp 0.5s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: $accent;
+    color: #1a1a18;
+    border: none;
+    border-radius: $radius-sm;
+    padding: 14px 32px;
+    font-family: $mono;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+    box-shadow: 0 2px 16px rgba(232, 255, 71, 0.22);
+
+    &:hover:not(:disabled) {
+      background: lighten(#e8ff47, 6%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(232, 255, 71, 0.32);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+
+  &__btn-icon {
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease;
+  }
+
+  &__btn:hover &__btn-icon {
+    transform: translateX(3px);
+  }
+
+  &__note {
+    font-family: $mono;
+    font-size: 11px;
+    color: $text-muted;
+    letter-spacing: 0.03em;
+    margin: 0;
+  }
+}
+
+// ── Generating / Loading screen ───────────────────────────────────────────────
+.ni-generating {
+  min-height: 100vh;
+  background: $bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $sans;
+  padding: 40px 24px;
+
+  &__inner {
+    text-align: center;
+    max-width: 400px;
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  &__spinner {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__title {
+    font-size: 22px;
+    font-weight: 600;
+    color: $text;
+    letter-spacing: -0.3px;
+    margin: 0 0 12px;
+  }
+
+  &__sub {
+    font-size: 14px;
+    color: $text-muted;
+    line-height: 1.6;
+    margin: 0 0 36px;
+  }
+
+  &__steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    background: $bg-card;
+    border: 1px solid $border-bright;
+    border-radius: $radius;
+    padding: 20px 24px;
+  }
+}
+
+// ── Spinner rings ─────────────────────────────────────────────────────────────
+.spinner-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: $accent;
+  animation: spin 1.1s linear infinite;
+
+  &--2 {
+    inset: 10px;
+    border-top-color: rgba(232, 255, 71, 0.5);
+    animation-duration: 0.85s;
+    animation-direction: reverse;
+  }
+
+  &--3 {
+    inset: 20px;
+    border-top-color: rgba(232, 255, 71, 0.25);
+    animation-duration: 1.4s;
+  }
+}
+
+// ── Generating step row ───────────────────────────────────────────────────────
+.ni-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  animation: stepFadeIn 0.4s ease forwards;
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $accent;
+    flex-shrink: 0;
+    animation: dot-pulse 1.4s ease-in-out infinite;
+  }
+
+  &__label {
+    font-family: $mono;
+    font-size: 12px;
+    color: $text-secondary;
+    letter-spacing: 0.04em;
+  }
+}

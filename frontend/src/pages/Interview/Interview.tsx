@@ -1,5 +1,5 @@
 import React from "react";
-import "./interview.scss";
+import "./scss/interview.scss";
 import { Link } from "react-router-dom";
 
 // ── Types ────────────────────────────────────────────────────────────────────
