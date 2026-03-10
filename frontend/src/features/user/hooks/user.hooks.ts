@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axiosInstance from "../../../utils/axios/axios";
+import { useUser } from "../../../context/user/user.context";
 interface AuthError {
   username?: string;
   email?: string;
@@ -26,9 +27,10 @@ interface LoginProps {
   password: string;
 }
 
-export const useUser = () => {
+export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<AuthError>({});
+  const { setUser } = useUser();
 
   const register = async (
     { confirmPass, email, password, username }: RegisterProps,
@@ -62,6 +64,12 @@ export const useUser = () => {
         username,
         email,
         password,
+      });
+
+      setUser({
+        name: res.data.username,
+        email,
+        id: res.data.id,
       });
 
       callbacks?.onSuccess?.(res.data);
@@ -100,6 +108,12 @@ export const useUser = () => {
         password,
       });
 
+      setUser({
+        name: res.data.username,
+        email,
+        id: res.data.id,
+      });
+
       callbacks?.onSuccess?.(res.data);
     } catch (error: any) {
       const message = error?.response?.data?.message || "Invalid credentials";
@@ -119,6 +133,7 @@ export const useUser = () => {
     try {
       const res = await axiosInstance.post("/auth/logout");
 
+      setUser(null);
       callbacks?.onSuccess?.(res.data);
     } catch (error) {
       callbacks?.onError?.(error);

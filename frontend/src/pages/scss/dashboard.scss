@@ -127,6 +127,7 @@ $sans: "DM Sans", sans-serif;
   }
 
   &__title {
+    text-transform: capitalize;
     font-size: clamp(26px, 4vw, 34px);
     font-weight: 600;
     color: $text;

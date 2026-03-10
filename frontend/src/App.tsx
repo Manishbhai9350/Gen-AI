@@ -7,10 +7,11 @@ import Dashboard from "./pages/Dashboard";
 import UnAuthenticatedRoute from "./components/auth/unauthenticated.route";
 import InterviewPage from "./pages/Interview/Interview";
 import NewInterviewPage from "./pages/Interview/NewInterview";
+import { UserProvider } from "./context/user/user.context";
 
 function App() {
   return (
-    <>
+    <UserProvider>
       <Toaster position="bottom-center" />
       <Routes>
         <Route
@@ -55,7 +56,7 @@ function App() {
           }
         />
       </Routes>
-    </>
+    </UserProvider>
   );
 }
 

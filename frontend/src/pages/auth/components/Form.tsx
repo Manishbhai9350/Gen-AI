@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./scss/form.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { useUser } from "../../../features/user/hooks/user.hooks";
+import { useAuth } from "../../../features/user/hooks/user.hooks";
 import toast from "react-hot-toast";
 
 interface FormProps {
@@ -16,7 +16,7 @@ const Form = ({ type = "signup" }: FormProps) => {
 
   const navigate = useNavigate();
 
-  const { login, register, loading, errors } = useUser();
+  const { login, register, loading, errors } = useAuth();
 
   async function OnSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();

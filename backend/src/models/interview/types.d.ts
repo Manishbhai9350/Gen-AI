@@ -52,11 +52,11 @@ declare global {
   }
 
   interface InterviewReport {
-    userId?: Types.ObjectId;
+    user: Types.ObjectId;
 
-    resume?: string;
-    jobDescription?: string;
-    userDescription?: string;
+    resume: string;
+    jobDescription: string;
+    userDescription: string;
 
     technicalQuestions: Question[];
     behavioralQuestions: Question[];

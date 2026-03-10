@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { Model, Schema, model } from "mongoose";
 
 const QuestionSchema = new Schema<Question>(
   {
@@ -82,7 +82,7 @@ const AISchema = new Schema<AIInfo>({
 
 const InterviewReportSchema = new Schema<InterviewReport>(
   {
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
@@ -120,6 +120,8 @@ const InterviewReportSchema = new Schema<InterviewReport>(
   },
 );
 
+InterviewReportSchema.index({ user: 1, createdAt: -1 });
+
 export const InterviewReportModel =
-  mongoose.models.InterviewReport ||
+  (mongoose.models.InterviewReport as Model<InterviewReport>) ||
   model<InterviewReport>("InterviewReport", InterviewReportSchema);

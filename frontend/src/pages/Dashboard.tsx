@@ -1,10 +1,7 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar/navbar.tsx";
 import "./scss/dashboard.scss";
-
-// ── Mock data — replace with real API data ────────────────────────────────────
-const MOCK_USER = { name: "Alex Rivera", initials: "AR" };
+import { useUser } from "../context/user/user.context.tsx";
 
 const MOCK_ANALYSES = [
   {
@@ -88,9 +85,15 @@ const ScoreRing = ({ score }: { score: number }) => {
 function Dashboard() {
   const navigate = useNavigate();
 
+  const { user, setUser } = useUser();
+
+  // if (user == null) {
+  //   return <Navigate to="/login" />;
+  // }
+
   return (
     <div className="dash-root">
-      <Navbar userName={MOCK_USER.name} userInitials={MOCK_USER.initials} />
+      <Navbar userName={user?.name} userInitials={user?.name.replaceAll(' ','').split('')[0].toUpperCase()} />
 
       <main className="dash-main">
         {/* Background glows */}
@@ -98,7 +101,6 @@ function Dashboard() {
         <div className="dash-glow dash-glow--right" />
 
         <div className="dash-container">
-
           {/* ── Hero greeting + CTA ── */}
           <section className="dash-hero">
             <div className="dash-hero__text">
@@ -107,7 +109,7 @@ function Dashboard() {
                 Dashboard
               </p>
               <h1 className="dash-hero__title">
-                Hey, {MOCK_USER.name.split(" ")[0]} 👋
+                Hey, {user?.name?.split(" ")[0]} 👋
               </h1>
               <p className="dash-hero__sub">
                 Ready to land your next role? Analyze your resume against any
@@ -119,7 +121,14 @@ function Dashboard() {
               onClick={() => navigate("/interview/new")}
             >
               <span className="cta-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
@@ -157,7 +166,14 @@ function Dashboard() {
                 onClick={() => navigate("/interviews")}
               >
                 See all
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
                   <line x1="5" y1="12" x2="19" y2="12" />
                   <polyline points="12 5 19 12 12 19" />
                 </svg>
@@ -167,7 +183,14 @@ function Dashboard() {
             {MOCK_ANALYSES.length === 0 ? (
               <div className="dash-empty">
                 <div className="dash-empty__icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
                     <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
                   </svg>
@@ -217,13 +240,20 @@ function Dashboard() {
                         {item.status === "strong"
                           ? "Strong"
                           : item.status === "good"
-                          ? "Good"
-                          : "Fair"}
+                            ? "Good"
+                            : "Fair"}
                       </span>
                     </div>
 
                     <div className="dash-analysis-card__arrow">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
                         <line x1="5" y1="12" x2="19" y2="12" />
                         <polyline points="12 5 19 12 12 19" />
                       </svg>
@@ -250,7 +280,6 @@ function Dashboard() {
               <button className="dash-usage__upgrade">Upgrade to Pro</button>
             </p>
           </section>
-
         </div>
       </main>
     </div>
