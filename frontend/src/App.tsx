@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import AuthenticatedRoute from "./components/auth/authenticated.route";
@@ -21,6 +21,7 @@ function App() {
             </AuthenticatedRoute>
           }
         />
+        <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route
           path="/login"
           element={

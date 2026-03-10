@@ -1,0 +1,587 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap");
+
+// ── Variables ────────────────────────────────────────────────────────────────
+$bg: #262624;
+$bg-card: #2f2f2c;
+$bg-card-hover: #353532;
+$bg-inset: #1e1e1c;
+$border: rgba(255, 255, 255, 0.07);
+$border-bright: rgba(255, 255, 255, 0.13);
+$text: #fff;
+$text-muted: rgba(255, 255, 255, 0.45);
+$text-secondary: rgba(255, 255, 255, 0.7);
+$accent: #e8ff47;
+$accent-dim: rgba(232, 255, 71, 0.12);
+$accent-border: rgba(232, 255, 71, 0.3);
+$green: #4ade80;
+$green-dim: rgba(74, 222, 128, 0.1);
+$green-border: rgba(74, 222, 128, 0.3);
+$red: #f87171;
+$red-dim: rgba(248, 113, 113, 0.1);
+$amber: #fbbf24;
+$amber-dim: rgba(251, 191, 36, 0.1);
+$amber-border: rgba(251, 191, 36, 0.3);
+$radius-sm: 8px;
+$radius: 14px;
+$mono: "Space Mono", monospace;
+$sans: "DM Sans", sans-serif;
+
+// ── Keyframes ────────────────────────────────────────────────────────────────
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}
+
+@keyframes fillBar {
+  from { width: 0; }
+}
+
+// ── Root ─────────────────────────────────────────────────────────────────────
+.dash-root {
+  min-height: 100vh;
+  background: $bg;
+  font-family: $sans;
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
+.dash-main {
+  position: relative;
+  overflow-x: hidden;
+  padding: 48px 24px 80px;
+}
+
+// ── Glows ────────────────────────────────────────────────────────────────────
+.dash-glow {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 0;
+
+  &--top {
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 420px;
+    background: radial-gradient(ellipse at center, rgba(232, 255, 71, 0.05) 0%, transparent 68%);
+  }
+
+  &--right {
+    top: 30%;
+    right: -200px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(ellipse at center, rgba(96, 165, 250, 0.035) 0%, transparent 68%);
+  }
+}
+
+// ── Container ────────────────────────────────────────────────────────────────
+.dash-container {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+// ── Hero ─────────────────────────────────────────────────────────────────────
+.dash-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  animation: fadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  &__text { flex: 1; }
+
+  &__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: $mono;
+    font-size: 11px;
+    color: $text-muted;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+
+    .eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: $accent;
+      animation: dot-pulse 1.8s ease-in-out infinite;
+    }
+  }
+
+  &__title {
+    font-size: clamp(26px, 4vw, 34px);
+    font-weight: 600;
+    color: $text;
+    letter-spacing: -0.5px;
+    margin: 0 0 10px;
+    line-height: 1.15;
+  }
+
+  &__sub {
+    font-size: 14px;
+    color: $text-muted;
+    line-height: 1.65;
+    margin: 0;
+    max-width: 440px;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: $accent;
+    color: #1a1a18;
+    border: none;
+    border-radius: $radius-sm;
+    padding: 13px 24px;
+    font-family: $mono;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+    box-shadow: 0 2px 16px rgba(232, 255, 71, 0.22);
+
+    .cta-icon {
+      display: flex;
+      align-items: center;
+      width: 24px;
+      height: 24px;
+      background: rgba(0, 0, 0, 0.12);
+      border-radius: 6px;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      background: lighten(#e8ff47, 5%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(232, 255, 71, 0.32);
+    }
+
+    &:active { transform: translateY(0); }
+  }
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+
+  @media (max-width: 720px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 400px) { grid-template-columns: 1fr; }
+}
+
+.dash-stat {
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  padding: 20px 18px;
+  animation: fadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: border-color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: $bg-card-hover;
+  }
+
+  &__label {
+    font-family: $mono;
+    font-size: 10px;
+    color: $text-muted;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+
+  &__value {
+    font-size: 28px;
+    font-weight: 600;
+    color: $text;
+    letter-spacing: -0.5px;
+    margin: 0 0 6px;
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+  }
+
+  &__unit {
+    font-size: 14px;
+    font-weight: 400;
+    color: $text-secondary;
+  }
+
+  &__delta {
+    font-family: $mono;
+    font-size: 10px;
+    color: $text-muted;
+    margin: 0;
+    letter-spacing: 0.03em;
+  }
+}
+
+// ── Recent ────────────────────────────────────────────────────────────────────
+.dash-recent {
+  animation: fadeUp 0.45s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: $text;
+    margin: 0;
+    letter-spacing: -0.2px;
+  }
+
+  &__see-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    font-family: $mono;
+    font-size: 11px;
+    color: $text-muted;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: color 0.15s ease;
+    text-transform: uppercase;
+
+    &:hover { color: $accent; }
+  }
+}
+
+// ── Analyses list ─────────────────────────────────────────────────────────────
+.dash-analyses {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dash-analysis-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  padding: 18px 20px;
+  cursor: pointer;
+  animation: fadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+
+  @media (max-width: 580px) {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: $bg-card-hover;
+    transform: translateX(3px);
+
+    .dash-analysis-card__arrow {
+      color: $accent;
+      transform: translateX(3px);
+    }
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__role {
+    font-size: 14px;
+    font-weight: 600;
+    color: $text;
+    margin: 0 0 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__company {
+    font-family: $mono;
+    font-size: 11px;
+    color: $text-muted;
+    letter-spacing: 0.03em;
+    margin: 0 0 10px;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+
+    @media (max-width: 580px) {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  &__date {
+    font-family: $mono;
+    font-size: 10px;
+    color: $text-muted;
+    margin: 0;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  &__arrow {
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+}
+
+// ── Tag pill ─────────────────────────────────────────────────────────────────
+.dash-tag {
+  font-family: $mono;
+  font-size: 10px;
+  color: $text-muted;
+  background: $bg-inset;
+  border: 1px solid $border-bright;
+  border-radius: 100px;
+  padding: 3px 9px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+// ── Score badge ───────────────────────────────────────────────────────────────
+.dash-badge {
+  font-family: $mono;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 100px;
+  padding: 4px 10px;
+  white-space: nowrap;
+
+  &--strong {
+    background: $green-dim;
+    color: $green;
+    border: 1px solid $green-border;
+  }
+
+  &--good {
+    background: $accent-dim;
+    color: $accent;
+    border: 1px solid $accent-border;
+  }
+
+  &--fair {
+    background: $amber-dim;
+    color: $amber;
+    border: 1px solid $amber-border;
+  }
+}
+
+// ── Score ring ────────────────────────────────────────────────────────────────
+.score-ring {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__track {
+    fill: none;
+    stroke: $bg-inset;
+    stroke-width: 3;
+  }
+
+  &__fill {
+    fill: none;
+    stroke-width: 3;
+    transition: stroke-dasharray 0.6s ease;
+  }
+
+  &__value {
+    position: absolute;
+    font-family: $mono;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  &--strong {
+    .score-ring__fill { stroke: $green; }
+    .score-ring__value { color: $green; }
+  }
+
+  &--good {
+    .score-ring__fill { stroke: $accent; }
+    .score-ring__value { color: $accent; }
+  }
+
+  &--fair {
+    .score-ring__fill { stroke: $amber; }
+    .score-ring__value { color: $amber; }
+  }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.dash-empty {
+  background: $bg-card;
+  border: 1.5px dashed $border-bright;
+  border-radius: $radius;
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+
+  &__icon {
+    color: $text-muted;
+    margin-bottom: 4px;
+  }
+
+  &__text {
+    font-size: 15px;
+    font-weight: 600;
+    color: $text-secondary;
+    margin: 0;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: $text-muted;
+    margin: 0 0 8px;
+  }
+
+  &__btn {
+    background: $accent-dim;
+    border: 1px solid $accent-border;
+    border-radius: $radius-sm;
+    padding: 8px 20px;
+    font-family: $mono;
+    font-size: 11px;
+    font-weight: 700;
+    color: $accent;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.18s ease;
+
+    &:hover { background: rgba(232, 255, 71, 0.18); }
+  }
+}
+
+// ── Usage bar ─────────────────────────────────────────────────────────────────
+.dash-usage {
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  padding: 20px 22px;
+  animation: fadeUp 0.45s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  &__label {
+    font-family: $mono;
+    font-size: 11px;
+    color: $text-muted;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__count {
+    font-family: $mono;
+    font-size: 12px;
+    font-weight: 700;
+    color: $text;
+    letter-spacing: 0.03em;
+  }
+
+  &__total {
+    color: $text-muted;
+    font-weight: 400;
+  }
+
+  &__track {
+    height: 6px;
+    background: $bg-inset;
+    border-radius: 100px;
+    overflow: hidden;
+    border: 1px solid $border;
+  }
+
+  &__fill {
+    height: 100%;
+    background: linear-gradient(90deg, $accent 0%, lighten(#e8ff47, 8%) 100%);
+    border-radius: 100px;
+    animation: fillBar 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 0.3s;
+  }
+
+  &__note {
+    font-family: $mono;
+    font-size: 10px;
+    color: $text-muted;
+    margin: 10px 0 0;
+    letter-spacing: 0.03em;
+  }
+
+  &__upgrade {
+    background: transparent;
+    border: none;
+    font-family: $mono;
+    font-size: 10px;
+    color: $accent;
+    cursor: pointer;
+    padding: 0;
+    letter-spacing: 0.03em;
+    transition: opacity 0.15s ease;
+
+    &:hover { opacity: 0.75; }
+  }
+}

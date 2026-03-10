@@ -341,7 +341,6 @@ const NewInterviewPage = () => {
             <button
               className="ni-submit__btn"
               onClick={handleSubmit}
-              disabled={submitState == "loading"}
             >
               <span className="ni-submit__btn-text">Generate Report</span>
               <span className="ni-submit__btn-icon">

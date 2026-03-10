@@ -1,6 +1,7 @@
 import React from "react";
 import "./scss/interview.scss";
 import { Link } from "react-router-dom";
+import Navbar from "../../components/navbar/navbar";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface SkillGap {
@@ -199,7 +200,7 @@ const InterviewPage: React.FC = () => {
   return (
     <div className="interview-page">
       {/* ── Navbar ── */}
-      <nav className="nav">
+      {/* <nav className="nav">
         <Link to="/dashboard">
           <div className="nav__logo">
             <img src="/images/logo.png" alt="JobSync" />
@@ -230,7 +231,8 @@ const InterviewPage: React.FC = () => {
             Export PDF
           </button>
         </div>
-      </nav>
+      </nav> */}
+      <Navbar context="interview" />
 
       {/* ── Body ── */}
       <main className="page-content">

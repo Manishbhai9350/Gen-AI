@@ -1,0 +1,300 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap");
+
+// ── Variables ────────────────────────────────────────────────────────────────
+$bg: #262624;
+$bg-card: #2f2f2c;
+$bg-card-hover: #353532;
+$bg-inset: #1e1e1c;
+$border: rgba(255, 255, 255, 0.07);
+$border-bright: rgba(255, 255, 255, 0.13);
+$text: #fff;
+$text-muted: rgba(255, 255, 255, 0.45);
+$text-secondary: rgba(255, 255, 255, 0.7);
+$accent: #e8ff47;
+$accent-dim: rgba(232, 255, 71, 0.12);
+$accent-border: rgba(232, 255, 71, 0.3);
+$green: #4ade80;
+$green-dim: rgba(74, 222, 128, 0.1);
+$red: #f87171;
+$red-dim: rgba(248, 113, 113, 0.1);
+$radius-sm: 8px;
+$radius: 14px;
+$mono: "Space Mono", monospace;
+$sans: "DM Sans", sans-serif;
+
+// ── Navbar ───────────────────────────────────────────────────────────────────
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 24px;
+  background: rgba(38, 38, 36, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid $border-bright;
+  font-family: $sans;
+}
+
+// ── Logo ─────────────────────────────────────────────────────────────────────
+.navbar__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+
+  &-icon {
+    width: 32px;
+    height: 32px;
+    background: $accent-dim;
+    border: 1px solid $accent-border;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+  }
+
+  &-text {
+    font-family: $mono;
+    font-size: 13px;
+    font-weight: 700;
+    color: $text;
+    letter-spacing: 0.04em;
+  }
+}
+
+// ── Interview Actions ─────────────────────────────────────────────────────────
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+.navbar__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  border-radius: $radius-sm;
+  font-family: $mono;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  border: 1px solid transparent;
+
+  &--ghost {
+    background: transparent;
+    border-color: $border-bright;
+    color: $text-secondary;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+      background: $bg-card;
+      color: $text;
+    }
+  }
+
+  &--accent {
+    background: $accent;
+    color: #1a1a18;
+    border-color: transparent;
+    box-shadow: 0 2px 10px rgba(232, 255, 71, 0.2);
+
+    &:hover {
+      background: lighten(#e8ff47, 5%);
+      box-shadow: 0 4px 18px rgba(232, 255, 71, 0.3);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// ── Right side ────────────────────────────────────────────────────────────────
+.navbar__right {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+// ── Profile trigger ───────────────────────────────────────────────────────────
+.navbar__profile {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 10px 5px 5px;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease;
+
+  &:hover,
+  &--open {
+    background: $bg-card;
+    border-color: $border-bright;
+  }
+}
+
+.navbar__avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: $accent-dim;
+  border: 1px solid $accent-border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  span {
+    font-family: $mono;
+    font-size: 10px;
+    font-weight: 700;
+    color: $accent;
+    letter-spacing: 0.03em;
+  }
+
+  &--lg {
+    width: 38px;
+    height: 38px;
+
+    span {
+      font-size: 12px;
+    }
+  }
+}
+
+.navbar__username {
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-secondary;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: 520px) {
+    display: none;
+  }
+}
+
+.navbar__chevron {
+  color: $text-muted;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+
+  .navbar__profile--open & {
+    transform: rotate(180deg);
+  }
+}
+
+// ── Dropdown overlay ──────────────────────────────────────────────────────────
+.navbar__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+// ── Dropdown ──────────────────────────────────────────────────────────────────
+.navbar__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 210px;
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 200;
+  overflow: hidden;
+  animation: dropIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes dropIn {
+    from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  &-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: $text;
+    margin: 0 0 2px;
+  }
+
+  &-role {
+    font-family: $mono;
+    font-size: 10px;
+    color: $text-muted;
+    letter-spacing: 0.04em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  &-divider {
+    height: 1px;
+    background: $border;
+    margin: 0;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 16px;
+    font-family: $sans;
+    font-size: 13px;
+    color: $text-secondary;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+    text-align: left;
+
+    svg { flex-shrink: 0; }
+
+    &:hover {
+      background: $bg-card-hover;
+      color: $text;
+    }
+
+    &--danger {
+      color: $red;
+
+      &:hover {
+        background: $red-dim;
+        color: $red;
+      }
+    }
+  }
+}
