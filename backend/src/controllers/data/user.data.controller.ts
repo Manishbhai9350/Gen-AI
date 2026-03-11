@@ -68,7 +68,7 @@ export const GetDashboardDataController = async (
 
     res.status(200).json({
       success: true,
-      data: {
+      report: {
         totalAnalysis,
         analysisThisWeek,
         averageScore: Math.round(averageScore || 0),

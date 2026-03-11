@@ -1,53 +1,10 @@
 import { Navigate, useNavigate } from "react-router-dom";
-import Navbar from "../components/navbar/navbar.tsx";
 import "./scss/dashboard.scss";
-import { useUser } from "../context/user/user.context.tsx";
-
-const MOCK_ANALYSES = [
-  {
-    id: "1",
-    role: "Senior Frontend Engineer",
-    company: "Stripe",
-    score: 87,
-    date: "2 hours ago",
-    tags: ["React", "TypeScript", "Design Systems"],
-    status: "strong",
-  },
-  {
-    id: "2",
-    role: "Product Designer",
-    company: "Linear",
-    score: 74,
-    date: "Yesterday",
-    tags: ["Figma", "UX Research", "Prototyping"],
-    status: "good",
-  },
-  {
-    id: "3",
-    role: "Full Stack Developer",
-    company: "Vercel",
-    score: 61,
-    date: "3 days ago",
-    tags: ["Next.js", "Node.js", "PostgreSQL"],
-    status: "fair",
-  },
-  {
-    id: "4",
-    role: "Staff Engineer",
-    company: "Figma",
-    score: 92,
-    date: "1 week ago",
-    tags: ["System Design", "Leadership", "Rust"],
-    status: "strong",
-  },
-];
-
-const MOCK_STATS = [
-  { label: "Analyses Run", value: "12", delta: "+3 this week" },
-  { label: "Avg. Score", value: "78", delta: "+4 vs last week", unit: "%" },
-  { label: "Top Match", value: "92", delta: "Staff Eng @ Figma", unit: "%" },
-  { label: "Analyses Left", value: "8", delta: "Free plan · 20/mo" },
-];
+import { useEffect, useState } from "react";
+import { useUser } from "../../context/user/user.context";
+import axiosInstance from "../../utils/axios/axios";
+import type { Analysis, InterviewReportResponse } from "./types";
+import Navbar from "../../components/navbar/navbar";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const scoreColor = (score: number) => {
@@ -83,6 +40,9 @@ const ScoreRing = ({ score }: { score: number }) => {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 function Dashboard() {
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   const { user, setUser } = useUser();
@@ -91,9 +51,89 @@ function Dashboard() {
   //   return <Navigate to="/login" />;
   // }
 
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const res = await axiosInstance.get<InterviewReportResponse>(
+          "/data/dashboard",
+          {
+            withCredentials: true,
+          },
+        );
+        setDashboardData(res.data.report);
+      } catch (err) {
+        console.error("Dashboard fetch failed", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  const stats = dashboardData
+    ? [
+        {
+          label: "Analyses Run",
+          value: dashboardData.totalAnalysis,
+          delta: `${dashboardData.analysisThisWeek} this week`,
+        },
+        {
+          label: "Avg. Score",
+          value: dashboardData.averageScore,
+          delta: "Across all analyses",
+          unit: "%",
+        },
+        {
+          label: "Top Match",
+          value: dashboardData.topMatch?.overallScore || 0,
+          delta: "Best performing analysis",
+          unit: "%",
+        },
+        {
+          label: "Analyses Left",
+          value: "8",
+          delta: "Free plan · 20/mo",
+        },
+      ]
+    : [];
+
+  const analyses: Analysis[] =
+    dashboardData?.recentAnalysis?.map((item: any) => ({
+      id: item._id,
+      role: "Frontend Engineer", // you can parse this later
+      company: "Company", // optional improvement later
+      score: item.overallScore,
+      date: new Date(item.createdAt).toLocaleDateString(),
+      tags: item.technicalQuestions?.[0]?.tags || [],
+      status: scoreColor(item.overallScore),
+    })) || [];
+
+  if (loading) {
+    return (
+      <div className="dash-root">
+        <Navbar
+          userName={user?.name}
+          userInitials={user?.name
+            .replaceAll(" ", "")
+            .split("")[0]
+            .toUpperCase()}
+        />
+        <main className="dash-main">
+          <div className="dash-container">
+            <p>Loading dashboard...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="dash-root">
-      <Navbar userName={user?.name} userInitials={user?.name.replaceAll(' ','').split('')[0].toUpperCase()} />
+      <Navbar
+        userName={user?.name}
+        userInitials={user?.name.replaceAll(" ", "").split("")[0].toUpperCase()}
+      />
 
       <main className="dash-main">
         {/* Background glows */}
@@ -139,7 +179,7 @@ function Dashboard() {
 
           {/* ── Stats row ── */}
           <section className="dash-stats">
-            {MOCK_STATS.map((stat, i) => (
+            {stats.map((stat, i) => (
               <div
                 key={stat.label}
                 className="dash-stat"
@@ -180,7 +220,7 @@ function Dashboard() {
               </button>
             </div>
 
-            {MOCK_ANALYSES.length === 0 ? (
+            {analyses.length === 0 ? (
               <div className="dash-empty">
                 <div className="dash-empty__icon">
                   <svg
@@ -208,7 +248,7 @@ function Dashboard() {
               </div>
             ) : (
               <div className="dash-analyses">
-                {MOCK_ANALYSES.map((item, i) => (
+                {analyses.map((item, i) => (
                   <div
                     key={item.id}
                     className="dash-analysis-card"
@@ -237,9 +277,9 @@ function Dashboard() {
                     <div className="dash-analysis-card__meta">
                       <p className="dash-analysis-card__date">{item.date}</p>
                       <span className={`dash-badge dash-badge--${item.status}`}>
-                        {item.status === "strong"
-                          ? "Strong"
-                          : item.status === "good"
+                        {item.status === "high"
+                          ? "High"
+                          : item.status === "medium"
                             ? "Good"
                             : "Fair"}
                       </span>

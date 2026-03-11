@@ -18,8 +18,6 @@ const AuthenticatedRoute = ({ children }: AuthenticatedRouteProps) => {
       try {
         const res = await axiosInstance.get("/auth/me");
 
-        console.log(res)
-
         if (res.data.isLoggedIn) {
           setUser({
             name: res.data.user.username,
