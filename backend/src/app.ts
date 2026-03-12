@@ -10,6 +10,7 @@ import { InterviewRouter } from "./routes/interview/interview.route.js";
 import { createGateway } from "@ai-sdk/gateway";
 import { AI_MODELS } from "./services/ai/ai.models.js";
 import { UserDataRouter } from "./routes/data/user.data.route.js";
+import { AuthMiddleware, BlackListMiddleware } from "./middlewares/auth.middleware.js";
 
 configDotenv();
 
@@ -33,8 +34,8 @@ app.use(urlencoded({ extended: true }));
 app.use(errorHandler);
 
 app.use("/auth", AuthRouter);
-app.use("/interview", InterviewRouter);
-app.use('/data', UserDataRouter)
+app.use("/interview", BlackListMiddleware, AuthMiddleware, InterviewRouter);
+app.use("/data", UserDataRouter);
 
 const gateway = createGateway({
   apiKey: process.env.AI_GATEWAY_API_KEY!,

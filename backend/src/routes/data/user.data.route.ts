@@ -6,6 +6,8 @@ const router = Router();
 
 
 
-router.get('/dashboard',BlackListMiddleware,AuthMiddleware,GetDashboardDataController)
+router.get('/dashboard',BlackListMiddleware,AuthMiddleware,GetDashboardDataController);
+router.get('/interview/:id',BlackListMiddleware,AuthMiddleware,GetDashboardDataController);
+
 
 export { router as UserDataRouter };

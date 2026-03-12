@@ -1,19 +1,22 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./scss/interview.scss";
-import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Navbar from "../../components/navbar/navbar";
+import axiosInstance from "../../utils/axios/axios";
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 interface SkillGap {
   skill: string;
   severity: "high" | "medium" | "low";
   explanation: string;
+  resources?: string[];
 }
 
 interface Question {
   question: string;
   difficulty: "easy" | "medium" | "hard";
   tags?: string[];
+  expectedAnswer?: string;
 }
 
 interface BehavioralQuestion {
@@ -21,17 +24,29 @@ interface BehavioralQuestion {
   difficulty: "easy" | "medium" | "hard";
 }
 
-interface Task {
+interface DailyTask {
+  _id: string;
   task: string;
+  completed: boolean;
 }
 
 interface DayPlan {
   day: number;
   focus: string;
-  tasks: Task[];
+  tasks: DailyTask[];
+  completedCount: number;
+  totalCount: number;
+  isCompleted: boolean;
+  isUnlocked: boolean;
+}
+
+interface PreparationPlan {
+  totalDays: number;
+  plan: DayPlan[];
 }
 
 interface Report {
+  _id: string;
   overallScore: number;
   sectionScores: {
     technical: number;
@@ -43,20 +58,16 @@ interface Report {
   skillGaps: SkillGap[];
   technicalQuestions: Question[];
   behavioralQuestions: BehavioralQuestion[];
-  preparationPlan: {
-    totalDays: number;
-    plan: DayPlan[];
-  };
+  preparationPlan: PreparationPlan;
+  jobDescription?: string;
+  createdAt: string;
 }
 
-// ── Dummy Data ────────────────────────────────────────────────────────────────
-const dummyReport: Report = {
+// ── Dummy fallback (remove once API is wired) ─────────────────────────────────
+const DUMMY: Report = {
+  _id: "dummy",
   overallScore: 80,
-  sectionScores: {
-    technical: 75,
-    behavioral: 85,
-    communication: 80,
-  },
+  sectionScores: { technical: 75, behavioral: 85, communication: 80 },
   strengths: [
     "Strong React fundamentals",
     "Clean component architecture",
@@ -71,34 +82,51 @@ const dummyReport: Report = {
     {
       skill: "Accessibility",
       severity: "medium",
-      explanation: "Limited knowledge of WCAG.",
+      explanation: "Limited knowledge of WCAG guidelines and best practices.",
     },
     {
       skill: "Testing",
       severity: "low",
-      explanation: "Jest / RTL not mentioned.",
+      explanation: "Jest / RTL not mentioned anywhere in the resume.",
+    },
+    {
+      skill: "System Design",
+      severity: "high",
+      explanation: "No evidence of large-scale architecture experience.",
     },
   ],
   technicalQuestions: [
     {
-      question: "Explain React Virtual DOM.",
+      question: "Explain React Virtual DOM and reconciliation.",
       difficulty: "medium",
       tags: ["React"],
     },
     {
-      question: "What are React Hooks?",
+      question: "What are React Hooks? List 5 with use cases.",
       difficulty: "easy",
       tags: ["React"],
+    },
+    {
+      question: "How does useCallback differ from useMemo?",
+      difficulty: "medium",
+      tags: ["React", "Performance"],
+    },
+    {
+      question: "Describe your approach to code-splitting.",
+      difficulty: "hard",
+      tags: ["Performance"],
     },
   ],
   behavioralQuestions: [
     {
-      question: "Tell me about a difficult project.",
+      question: "Tell me about a time you navigated a difficult project.",
       difficulty: "medium",
     },
+    { question: "How do you handle tight deadlines?", difficulty: "easy" },
     {
-      question: "How do you handle tight deadlines?",
-      difficulty: "easy",
+      question:
+        "Describe a disagreement with a teammate and how you resolved it.",
+      difficulty: "medium",
     },
   ],
   preparationPlan: {
@@ -107,70 +135,121 @@ const dummyReport: Report = {
       {
         day: 1,
         focus: "React Fundamentals",
-        tasks: [{ task: "Review hooks" }, { task: "Build reusable component" }],
+        isUnlocked: true,
+        isCompleted: false,
+        completedCount: 0,
+        totalCount: 2,
+        tasks: [
+          { _id: "t1", task: "Review hooks in-depth", completed: false },
+          { _id: "t2", task: "Build a reusable component", completed: false },
+        ],
       },
       {
         day: 2,
         focus: "Testing",
-        tasks: [{ task: "Learn Jest basics" }, { task: "Write sample tests" }],
+        isUnlocked: false,
+        isCompleted: false,
+        completedCount: 0,
+        totalCount: 2,
+        tasks: [
+          { _id: "t3", task: "Learn Jest basics", completed: false },
+          { _id: "t4", task: "Write sample unit tests", completed: false },
+        ],
       },
       {
         day: 3,
         focus: "Accessibility",
-        tasks: [{ task: "Study ARIA roles" }, { task: "Audit sample UI" }],
+        isUnlocked: false,
+        isCompleted: false,
+        completedCount: 0,
+        totalCount: 2,
+        tasks: [
+          {
+            _id: "t5",
+            task: "Study ARIA roles and landmarks",
+            completed: false,
+          },
+          {
+            _id: "t6",
+            task: "Audit a sample UI for a11y issues",
+            completed: false,
+          },
+        ],
       },
     ],
   },
+  jobDescription: "Senior Frontend Engineer",
+  createdAt: new Date().toISOString(),
 };
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const scoreColor = (score: number) =>
+  score >= 80 ? "green" : score >= 60 ? "accent" : "red";
 
-const ScoreCircle: React.FC<{ score: number }> = ({ score }) => {
-  const radius = 65;
-  const circumference = 2 * Math.PI * radius; // ≈ 408.4
-  const dashOffset = circumference - (score / 100) * circumference;
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
+// ── Sub-components ─────────────────────────────────────────────────────────────
+
+const ScoreRing: React.FC<{ score: number }> = ({ score }) => {
+  const r = 65;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (score / 100) * circ;
+  const color = scoreColor(score);
   return (
-    <div className="card score-circle-card">
-      <div className="arc-wrap">
-        <svg viewBox="0 0 160 160">
-          <circle className="track" cx="80" cy="80" r={radius} />
+    <div className="card score-ring-card">
+      <div className="score-ring-card__wrap">
+        <svg viewBox="0 0 160 160" className="score-ring-card__svg">
+          <circle className="sr-track" cx="80" cy="80" r={r} />
           <circle
-            className="progress"
+            className={`sr-fill sr-fill--${color}`}
             cx="80"
             cy="80"
-            r={radius}
-            style={{ "--dash-offset": dashOffset } as React.CSSProperties}
+            r={r}
+            style={{ "--dash-offset": offset } as React.CSSProperties}
           />
         </svg>
-        <div className="score-circle-card__inner">
-          <span className="score-circle-card__number">{score}</span>
-          <span className="score-circle-card__denom">/100</span>
+        <div className="score-ring-card__center">
+          <span className="score-ring-card__num">{score}</span>
+          <span className="score-ring-card__denom">/100</span>
         </div>
       </div>
-      <span className="score-circle-card__label">Overall Score</span>
+      <span className="score-ring-card__label">Overall Score</span>
     </div>
   );
 };
 
-const SectionScores: React.FC<{ scores: Report["sectionScores"] }> = ({
+const SectionBreakdown: React.FC<{ scores: Report["sectionScores"] }> = ({
   scores,
 }) => {
-  const entries = Object.entries(scores) as [keyof typeof scores, number][];
+  const entries = Object.entries(scores) as [string, number][];
+  const colorMap: Record<string, string> = {
+    technical: "blue",
+    behavioral: "green",
+    communication: "accent",
+  };
   return (
-    <div className="card section-scores">
-      <p className="card-header">Section Breakdown</p>
-      <div className="scores-inner">
-        {entries.map(([key, value]) => (
-          <div className="score-row" key={key}>
-            <div className="score-row__header">
-              <span className="score-row__name">{key}</span>
-              <span className="score-row__value">{value}%</span>
+    <div className="card section-breakdown">
+      <p className="card-label">Section Breakdown</p>
+      <div className="section-breakdown__list">
+        {entries.map(([key, val]) => (
+          <div className="sbar" key={key}>
+            <div className="sbar__header">
+              <span className="sbar__name">{key}</span>
+              <span
+                className={`sbar__val sbar__val--${colorMap[key] ?? "accent"}`}
+              >
+                {val}%
+              </span>
             </div>
-            <div className="score-row__track">
+            <div className="sbar__track">
               <div
-                className={`score-row__fill score-row__fill--${key}`}
-                style={{ "--bar-width": `${value}%` } as React.CSSProperties}
+                className={`sbar__fill sbar__fill--${colorMap[key] ?? "accent"}`}
+                style={{ "--bar-w": `${val}%` } as React.CSSProperties}
               />
             </div>
           </div>
@@ -183,8 +262,8 @@ const SectionScores: React.FC<{ scores: Report["sectionScores"] }> = ({
 const SeverityBadge: React.FC<{ severity: SkillGap["severity"] }> = ({
   severity,
 }) => (
-  <span className={`severity-badge severity-badge--${severity}`}>
-    <span className="dot" />
+  <span className={`sev-badge sev-badge--${severity}`}>
+    <span className="sev-dot" />
     {severity}
   </span>
 );
@@ -193,126 +272,339 @@ const DiffBadge: React.FC<{ difficulty: string }> = ({ difficulty }) => (
   <span className={`diff-badge diff-badge--${difficulty}`}>{difficulty}</span>
 );
 
+// ── Day Progress Ring (small) ─────────────────────────────────────────────────
+const DayRing: React.FC<{ completed: number; total: number }> = ({
+  completed,
+  total,
+}) => {
+  const pct = total === 0 ? 0 : (completed / total) * 100;
+  const r = 14;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (pct / 100) * circ;
+  return (
+    <div className="day-ring">
+      <svg width="36" height="36" viewBox="0 0 36 36">
+        <circle
+          cx="18"
+          cy="18"
+          r={r}
+          fill="none"
+          strokeWidth="3"
+          className="day-ring__track"
+        />
+        <circle
+          cx="18"
+          cy="18"
+          r={r}
+          fill="none"
+          strokeWidth="3"
+          className="day-ring__fill"
+          strokeDasharray={`${circ - offset} ${offset}`}
+          strokeLinecap="round"
+          transform="rotate(-90 18 18)"
+        />
+      </svg>
+      <span className="day-ring__pct">{Math.round(pct)}%</span>
+    </div>
+  );
+};
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 const InterviewPage: React.FC = () => {
-  const report = dummyReport; // replace with API data later
+  const { id } = useParams<{ id: string }>();
+  const [report, setReport] = useState<Report>(DUMMY);
+  const [loading, setLoading] = useState(false);
+  const [toggling, setToggling] = useState<string | null>(null); // taskId being toggled
+  const [activeDay, setActiveDay] = useState<number>(0);
+
+  // ── Fetch report ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!id || id === "dummy") return;
+    setLoading(true);
+    axiosInstance
+      .get(`/interview/${id}`)
+      .then((res) => setReport(res.data.report))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  // ── Set active day to first unlocked + incomplete ───────────────────────────
+  useEffect(() => {
+    const plan = report.preparationPlan?.plan ?? [];
+    const idx = plan.findIndex((d) => d.isUnlocked && !d.isCompleted);
+    setActiveDay(idx >= 0 ? idx : 0);
+  }, []);
+
+  // ── Toggle task ─────────────────────────────────────────────────────────────
+  const handleToggleTask = useCallback(
+    async (dayIndex: number, taskId: string) => {
+      const day = report.preparationPlan?.plan?.[dayIndex];
+      if (!day?.isUnlocked) return;
+
+      setToggling(taskId);
+
+      // Optimistic update
+      setReport((prev) => {
+        const plan = prev.preparationPlan.plan.map((d, di) => {
+          if (di !== dayIndex) return d;
+          const tasks = d.tasks.map((t) =>
+            t._id === taskId ? { ...t, completed: !t.completed } : t,
+          );
+          const completedCount = tasks.filter((t) => t.completed).length;
+          const isCompleted = completedCount === tasks.length;
+          return { ...d, tasks, completedCount, isCompleted };
+        });
+
+        // Unlock next day optimistically
+        const updatedPlan = plan.map((d, di) => {
+          if (di === dayIndex + 1 && plan[dayIndex].isCompleted) {
+            return { ...d, isUnlocked: true };
+          }
+          return d;
+        });
+
+        return {
+          ...prev,
+          preparationPlan: { ...prev.preparationPlan, plan: updatedPlan },
+        };
+      });
+
+      try {
+        const res = await axiosInstance.patch(
+          `/interview/${report._id}/tasks`,
+          {
+            dayIndex,
+            taskId,
+          },
+        );
+        // Sync with server response (source of truth)
+        setReport((prev) => ({
+          ...prev,
+          preparationPlan: res.data.preparationPlan,
+        }));
+      } catch (err) {
+        console.error(err);
+        // Revert optimistic update on error
+        if (id && id !== "dummy") {
+          const res = await axiosInstance.get(`/interview/${id}`);
+          setReport(res.data.report);
+        }
+      } finally {
+        setToggling(null);
+      }
+    },
+    [report, id],
+  );
+
+  if (loading) {
+    return (
+      <div className="interview-page">
+        <Navbar context="interview" />
+        <div className="ip-loading">
+          <div className="ip-loading__spinner" />
+          <p>Loading report...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const plan = report.preparationPlan?.plan ?? [];
+  const totalTasks = plan.reduce((acc, d) => acc + d.totalCount, 0);
+  const doneTasks = plan.reduce((acc, d) => acc + d.completedCount, 0);
+  const planPct =
+    totalTasks === 0 ? 0 : Math.round((doneTasks / totalTasks) * 100);
+
+  const allTasksDone = plan.every((d) => d.isCompleted);
 
   return (
     <div className="interview-page">
-      {/* ── Navbar ── */}
-      {/* <nav className="nav">
-        <Link to="/dashboard">
-          <div className="nav__logo">
-            <img src="/images/logo.png" alt="JobSync" />
-            <span>JobSync</span>
-          </div>
-        </Link>
-
-        <div className="nav__badge">
-          <span className="dot" />
-          Analysis Ready
-        </div>
-
-        <div className="nav__actions">
-          <button className="btn btn--ghost btn--back">← Back</button>
-          <button className="btn btn--accent">
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Export PDF
-          </button>
-        </div>
-      </nav> */}
       <Navbar context="interview" />
 
-      {/* ── Body ── */}
-      <main className="page-content">
-        {/* Hero */}
-        <header className="hero-header">
-          <p className="hero-header__eyebrow">Interview Prep Report</p>
-          <h1 className="hero-header__title">
-            You're <strong>{report.overallScore}% ready</strong>
-            <br />
-            for your next interview.
-          </h1>
-          <p className="hero-header__meta">
-            Generated just now · Frontend Engineer Role
-          </p>
-        </header>
+      <main className="ip-main">
+        {/* ── Hero ── */}
+        <header className="ip-hero">
+          {/* background grid */}
+          <div className="ip-hero__grid" />
+          <div className="ip-hero__glow" />
 
-        {/* Overview: Score Circle + Section Scores */}
-        <p className="section-title">Overview</p>
+          {/* top row — eyebrow + date */}
+          <div className="ip-hero__topbar">
+            <div className="ip-hero__eyebrow">
+              <span className="eyebrow-dot" />
+              Interview Prep Report
+            </div>
+            <span className="ip-hero__date">
+              {report.jobDescription && <>{report.jobDescription} · </>}
+              {formatDate(report.createdAt)}
+            </span>
+          </div>
+
+          {/* center — big score + title */}
+          <div className="ip-hero__center">
+            <div className="ip-hero__score-wrap">
+              <span className="ip-hero__score-num">{report.overallScore}</span>
+              <span className="ip-hero__score-denom">/100</span>
+            </div>
+            <h1 className="ip-hero__title">
+              You're{" "}
+              <span className="ip-hero__title--accent">
+                {report.overallScore >= 80
+                  ? "well prepared"
+                  : report.overallScore >= 60
+                    ? "almost ready"
+                    : "getting there"}
+              </span>
+              <br />
+              for your next interview.
+            </h1>
+          </div>
+
+          {/* bottom row — 3 stats */}
+          <div className="ip-hero__stats">
+            <div className="ip-hero__stat">
+              <span className="ip-hero__stat-num">
+                {report.skillGaps.length}
+              </span>
+              <span className="ip-hero__stat-lbl">Skill Gaps</span>
+            </div>
+            <div className="ip-hero__stat-divider" />
+            <div className="ip-hero__stat">
+              <span className="ip-hero__stat-num">{planPct}%</span>
+              <span className="ip-hero__stat-lbl">Plan Done</span>
+            </div>
+            <div className="ip-hero__stat-divider" />
+            <div className="ip-hero__stat">
+              <span className="ip-hero__stat-num">
+                {report.technicalQuestions.length +
+                  report.behavioralQuestions.length}
+              </span>
+              <span className="ip-hero__stat-lbl">Questions</span>
+            </div>
+            <div className="ip-hero__stat-divider" />
+            <div className="ip-hero__stat">
+              <span className="ip-hero__stat-num">
+                {report.strengths.length}
+              </span>
+              <span className="ip-hero__stat-lbl">Strengths</span>
+            </div>
+          </div>
+        </header>
+        {/* ── Overview ── */}
+        <div className="ip-section-label">Overview</div>
         <div className="overview-grid">
-          <ScoreCircle score={report.overallScore} />
-          <SectionScores scores={report.sectionScores} />
+          <ScoreRing score={report.overallScore} />
+          <SectionBreakdown scores={report.sectionScores} />
         </div>
 
-        {/* Strengths + Improvements */}
-        <p className="section-title">Insights</p>
+        {/* ── Insights ── */}
+        <div className="ip-section-label">Insights</div>
         <div className="two-col">
           <div className="card">
-            <p className="section-title">Strengths</p>
-            <div className="list-items">
+            <p className="card-label">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Strengths
+            </p>
+            <div className="insight-list">
               {report.strengths.map((s, i) => (
-                <div className="list-item list-item--strength" key={i}>
-                  <span className="list-item__icon">✓</span>
-                  {s}
+                <div className="insight-item insight-item--strength" key={i}>
+                  <span className="insight-icon">✓</span>
+                  <span>{s}</span>
                 </div>
               ))}
             </div>
           </div>
-
           <div className="card">
-            <p className="section-title">To Improve</p>
-            <div className="list-items">
+            <p className="card-label">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <line x1="12" y1="19" x2="12" y2="5" />
+                <polyline points="5 12 12 5 19 12" />
+              </svg>
+              To Improve
+            </p>
+            <div className="insight-list">
               {report.improvements.map((s, i) => (
-                <div className="list-item list-item--improve" key={i}>
-                  <span className="list-item__icon">↑</span>
-                  {s}
+                <div className="insight-item insight-item--improve" key={i}>
+                  <span className="insight-icon">↑</span>
+                  <span>{s}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Skill Gaps */}
-        <p className="section-title">Skill Gaps</p>
+        {/* ── Skill Gaps ── */}
+        <div className="ip-section-label">Skill Gaps</div>
         <div className="card full-row">
-          <div className="skill-gaps-list">
+          <div className="skill-gaps">
             {report.skillGaps.map((gap, i) => (
-              <div className="skill-gap-item" key={i}>
-                <div className="skill-gap-item__top">
-                  <span className="skill-gap-item__name">{gap.skill}</span>
+              <div className="gap-item" key={i}>
+                <div className="gap-item__top">
+                  <span className="gap-item__skill">{gap.skill}</span>
                   <SeverityBadge severity={gap.severity} />
                 </div>
-                <p className="skill-gap-item__explanation">{gap.explanation}</p>
+                <p className="gap-item__desc">{gap.explanation}</p>
+                {gap.resources && gap.resources.length > 0 && (
+                  <div className="gap-item__resources">
+                    {gap.resources.map((r, ri) => (
+                      <a
+                        key={ri}
+                        href={r}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="gap-resource"
+                      >
+                        {r}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Questions */}
-        <p className="section-title">Practice Questions</p>
+        {/* ── Questions ── */}
+        <div className="ip-section-label">Practice Questions</div>
         <div className="two-col">
           <div className="card">
-            <p className="section-title">Technical</p>
-            <div className="questions-list">
+            <p className="card-label">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              Technical
+            </p>
+            <div className="q-list">
               {report.technicalQuestions.map((q, i) => (
                 <div className="q-item" key={i}>
                   <p className="q-item__text">{q.question}</p>
                   <div className="q-item__meta">
                     <DiffBadge difficulty={q.difficulty} />
                     {q.tags?.map((tag) => (
-                      <span className="tag-badge" key={tag}>
+                      <span className="tag-pill" key={tag}>
                         {tag}
                       </span>
                     ))}
@@ -321,10 +613,22 @@ const InterviewPage: React.FC = () => {
               ))}
             </div>
           </div>
-
           <div className="card">
-            <p className="section-title">Behavioral</p>
-            <div className="questions-list">
+            <p className="card-label">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+              </svg>
+              Behavioral
+            </p>
+            <div className="q-list">
               {report.behavioralQuestions.map((q, i) => (
                 <div className="q-item" key={i}>
                   <p className="q-item__text">{q.question}</p>
@@ -337,29 +641,212 @@ const InterviewPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Prep Plan */}
-        <p className="section-title">Preparation Plan</p>
-        <div className="card full-row">
-          <div className="prep-plan">
-            <div className="prep-plan__summary">
-              ◆ {report.preparationPlan.totalDays}-Day Study Plan
+        {/* ── Preparation Plan ── */}
+        <div className="ip-section-label">Preparation Plan</div>
+        <div className="card full-row prep-card">
+          {/* Plan header */}
+          <div className="prep-header">
+            <div className="prep-header__left">
+              <span className="prep-header__title">
+                ◆ {report.preparationPlan?.totalDays}-Day Study Plan
+              </span>
+              <span className="prep-header__sub">
+                {doneTasks} of {totalTasks} tasks completed
+              </span>
             </div>
-            <div className="prep-plan__days">
-              {report.preparationPlan.plan.map((d) => (
-                <div className="day-card" key={d.day}>
-                  <p className="day-card__num">Day {d.day}</p>
-                  <p className="day-card__focus">{d.focus}</p>
-                  <div className="day-card__tasks">
-                    {d.tasks.map((t, i) => (
-                      <div className="day-card__task" key={i}>
-                        <span className="checkbox" />
-                        {t.task}
-                      </div>
-                    ))}
-                  </div>
+            <div className="prep-header__right">
+              <div className="prep-overall-bar">
+                <div className="prep-overall-bar__track">
+                  <div
+                    className="prep-overall-bar__fill"
+                    style={{ width: `${planPct}%` }}
+                  />
                 </div>
-              ))}
+                <span className="prep-overall-bar__pct">{planPct}%</span>
+              </div>
             </div>
+          </div>
+
+          {/* Day tabs */}
+          <div className="day-tabs">
+            {plan.map((day, di) => (
+              <button
+                key={day.day}
+                className={[
+                  "day-tab",
+                  di === activeDay ? "day-tab--active" : "",
+                  day.isCompleted ? "day-tab--done" : "",
+                  !day.isUnlocked ? "day-tab--locked" : "",
+                ].join(" ")}
+                onClick={() => day.isUnlocked && setActiveDay(di)}
+                disabled={!day.isUnlocked}
+              >
+                {day.isCompleted ? (
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                ) : !day.isUnlocked ? (
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                  >
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                  </svg>
+                ) : (
+                  <span className="day-tab__num">{day.day}</span>
+                )}
+                <span className="day-tab__label">Day {day.day}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Active day panel */}
+          {plan[activeDay] &&
+            (() => {
+              const day = plan[activeDay];
+              return (
+                <div
+                  className={`day-panel ${!day.isUnlocked ? "day-panel--locked" : ""}`}
+                >
+                  <div className="day-panel__header">
+                    <div className="day-panel__info">
+                      <span className="day-panel__num">Day {day.day}</span>
+                      <h3 className="day-panel__focus">{day.focus}</h3>
+                    </div>
+                    <DayRing
+                      completed={day.completedCount}
+                      total={day.totalCount}
+                    />
+                  </div>
+
+                  {!day.isUnlocked ? (
+                    <div className="day-panel__locked">
+                      <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      >
+                        <rect x="3" y="11" width="18" height="11" rx="2" />
+                        <path d="M7 11V7a5 5 0 0110 0v4" />
+                      </svg>
+                      <p>Complete Day {day.day - 1} to unlock this day.</p>
+                    </div>
+                  ) : (
+                    <div className="day-panel__tasks">
+                      {day.tasks.map((task) => (
+                        <button
+                          key={task._id}
+                          className={`task-row ${task.completed ? "task-row--done" : ""} ${toggling === task._id ? "task-row--loading" : ""}`}
+                          onClick={() => handleToggleTask(activeDay, task._id)}
+                          disabled={toggling === task._id}
+                        >
+                          <span
+                            className={`task-checkbox ${task.completed ? "task-checkbox--checked" : ""}`}
+                          >
+                            {task.completed && (
+                              <svg
+                                width="10"
+                                height="10"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3.5"
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            )}
+                          </span>
+                          <span className="task-text">{task.task}</span>
+                          {toggling === task._id && (
+                            <span className="task-spinner" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {day.isCompleted && (
+                    <div className="day-panel__complete-banner">
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      Day {day.day} complete!
+                      {plan[activeDay + 1] &&
+                        !plan[activeDay + 1].isCompleted && (
+                          <button
+                            className="day-next-btn"
+                            onClick={() => setActiveDay(activeDay + 1)}
+                          >
+                            Go to Day {day.day + 1} →
+                          </button>
+                        )}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+          <div className="export-btn-container">
+            <button
+              className={`export-btn ${!allTasksDone ? "export-btn--locked" : ""}`}
+              onClick={() => {}}
+              disabled={!allTasksDone}
+              title={
+                !allTasksDone
+                  ? "Complete all preparation tasks to unlock PDF export"
+                  : "Export PDF"
+              }
+            >
+              {!allTasksDone ? (
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0110 0v4" />
+                </svg>
+              ) : (
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              )}
+              Export PDF
+            </button>
           </div>
         </div>
       </main>

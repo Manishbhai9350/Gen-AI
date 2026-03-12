@@ -27,9 +27,13 @@ declare global {
   }
 
   interface PreparationDay {
-    day: number;
-    focus: string;
-    tasks: DailyTask[];
+    day: Number,
+    focus: String,
+    tasks: DailyTaskSchema[],
+    completedCount: Number,
+    totalCount: Number,
+    isCompleted: Boolean,
+    isUnlocked: Boolean,
   }
 
   interface PreparationPlan {
@@ -63,7 +67,7 @@ declare global {
 
     skillGaps: SkillGap[];
 
-    preparationPlan?: PreparationPlan[];
+    preparationPlan?: PreparationPlan;
 
     sectionScores?: SectionScores;
 

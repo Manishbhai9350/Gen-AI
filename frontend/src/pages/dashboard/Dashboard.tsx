@@ -305,7 +305,7 @@ function Dashboard() {
           </section>
 
           {/* ── Usage bar ── */}
-          <section className="dash-usage">
+          {/* <section className="dash-usage">
             <div className="dash-usage__header">
               <span className="dash-usage__label">Monthly Usage</span>
               <span className="dash-usage__count">
@@ -319,7 +319,7 @@ function Dashboard() {
               8 analyses remaining ·{" "}
               <button className="dash-usage__upgrade">Upgrade to Pro</button>
             </p>
-          </section>
+          </section> */}
         </div>
       </main>
     </div>

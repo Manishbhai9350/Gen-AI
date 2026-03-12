@@ -553,7 +553,7 @@ const Landing = () => {
             and tells you exactly what to fix. Powered by AI. Done in seconds.
           </p>
           <div className="hero__actions">
-            <Link to="/signup" className="hero__cta">
+            <Link to="/interview/new" className="hero__cta">
               <svg
                 width="15"
                 height="15"
