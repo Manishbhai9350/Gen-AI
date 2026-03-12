@@ -3,6 +3,7 @@ import "./scss/interview.scss";
 import { useParams } from "react-router-dom";
 import Navbar from "../../components/navbar/navbar";
 import axiosInstance from "../../utils/axios/axios";
+import Loader from "../../components/loader/loader";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface SkillGap {
@@ -398,13 +399,7 @@ const InterviewPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="interview-page">
-        <Navbar context="interview" />
-        <div className="ip-loading">
-          <div className="ip-loading__spinner" />
-          <p>Loading report...</p>
-        </div>
-      </div>
+      <Loader variant="interview" />
     );
   }
 

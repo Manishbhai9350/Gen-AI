@@ -175,7 +175,7 @@ $sans: "DM Sans", sans-serif;
     }
 
     &:hover {
-      background: lighten(#e8ff47, 5%);
+      background: rgba(232, 255, 71, 0.3);
       transform: translateY(-2px);
       box-shadow: 0 6px 24px rgba(232, 255, 71, 0.32);
     }
@@ -558,7 +558,7 @@ $sans: "DM Sans", sans-serif;
 
   &__fill {
     height: 100%;
-    background: linear-gradient(90deg, $accent 0%, lighten(#e8ff47, 8%) 100%);
+    background: linear-gradient(90deg, $accent 0%, rgba(232, 255, 71, 0.8) 100%);
     border-radius: 100px;
     animation: fillBar 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: 0.3s;

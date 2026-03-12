@@ -1,0 +1,525 @@
+// ── Variables (matches design system) ────────────────────────────────────────
+$bg: #262624;
+$bg-card: #2f2f2c;
+$bg-inset: #1e1e1c;
+$border-bright: rgba(255, 255, 255, 0.13);
+$accent: #e8ff47;
+$text-muted: rgba(255, 255, 255, 0.45);
+$border: rgba(255, 255, 255, 0.07);
+$radius-sm: 8px;
+$radius: 14px;
+$mono: "Space Mono", monospace;
+
+// ── Shimmer keyframe ──────────────────────────────────────────────────────────
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Skeleton base ─────────────────────────────────────────────────────────────
+.skel {
+  background: linear-gradient(
+    90deg,
+    $bg-inset 0px,
+    rgba(255, 255, 255, 0.04) 200px,
+    $bg-inset 400px
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+// ── Fullscreen loader ─────────────────────────────────────────────────────────
+.sk-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: $bg;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  animation: fadeUp 0.3s ease both;
+
+  &__spinner {
+    position: relative;
+    width: 48px;
+    height: 48px;
+  }
+
+  &__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: $accent;
+    animation: spin 0.9s linear infinite;
+
+    &--2 {
+      inset: 8px;
+      border-top-color: rgba(232, 255, 71, 0.35);
+      animation-duration: 0.65s;
+      animation-direction: reverse;
+    }
+  }
+
+  &__message {
+    font-family: $mono;
+    font-size: 11px;
+    color: $text-muted;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+// ── Dashboard skeleton ────────────────────────────────────────────────────────
+.sk-dashboard {
+  min-height: 100vh;
+  background: $bg;
+  animation: fadeUp 0.35s ease both;
+}
+
+// Skeleton navbar
+.sk-nav {
+  height: 60px;
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid $border-bright;
+  background: rgba(38, 38, 36, 0.82);
+  backdrop-filter: blur(16px);
+
+  &__left,
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+// Body wrapper (matches dash-main padding)
+.sk-dashboard__body {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+// Hero skeleton
+.sk-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+// Stats skeleton
+.sk-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+
+  @media (max-width: 720px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 400px) { grid-template-columns: 1fr; }
+}
+
+.sk-stat-card {
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+// Section header
+.sk-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Analysis cards
+.sk-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sk-analysis-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  padding: 18px 20px;
+  animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 580px) {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+}
+
+.sk-tags {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+// APPEND THIS TO THE BOTTOM OF YOUR EXISTING loader.scss
+// ─────────────────────────────────────────────────────────────────────────────
+
+
+// ── Interview page skeleton ───────────────────────────────────────────────────
+.sk-interview {
+  min-height: 100vh;
+  background: $bg;
+  animation: fadeUp 0.35s ease both;
+}
+
+.sk-interview__body {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 48px 28px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+// Section label row
+.sk-section-lbl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.5;
+}
+
+// Hero card
+.sk-ip-hero {
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: 20px;
+  padding: 40px 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-bottom: 8px;
+
+  &__topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__center {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  &__title-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__stats {
+    background: $bg-inset;
+    border: 1px solid $border-bright;
+    border-radius: $radius;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+}
+
+.sk-ip-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 16px 28px;
+  flex: 1;
+}
+
+.sk-ip-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: $border-bright;
+  flex-shrink: 0;
+}
+
+// Generic card used throughout
+.sk-ip-card {
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  padding: 24px;
+
+  &--full {
+    width: 100%;
+  }
+}
+
+// Overview grid
+.sk-ip-overview {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 14px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sk-ip-ring-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.sk-ip-bar-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.sk-ip-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+// Two-col grid
+.sk-ip-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+
+  @media (max-width: 680px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Insight items
+.sk-ip-insight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  background: $bg-inset;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+}
+
+// Skill gap items
+.sk-ip-gap-item {
+  padding: 18px 0;
+  border-top: 1px solid $border;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.sk-ip-gap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+
+// Question items
+.sk-ip-q-item {
+  padding: 16px 0;
+  border-top: 1px solid $border;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.sk-ip-q-meta {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+// Prep plan
+.sk-ip-prep {
+  padding: 28px;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  &__bar-wrap {
+    flex: 1;
+    max-width: 260px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.sk-ip-day-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $border;
+}
+
+.sk-ip-day-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+}
+
+.sk-ip-export {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+
+// ── New Interview page skeleton ───────────────────────────────────────────────
+.sk-new-interview {
+  min-height: 100vh;
+  background: $bg;
+  animation: fadeUp 0.35s ease both;
+}
+
+.sk-ni-wrapper {
+  padding: 48px 24px 80px;
+  position: relative;
+}
+
+.sk-ni-container {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+// Header block
+.sk-ni-header {
+  text-align: center;
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// Step indicators
+.sk-ni-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 44px;
+}
+
+.sk-ni-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+// Form
+.sk-ni-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+// Section card
+.sk-ni-section {
+  background: $bg-card;
+  border: 1px solid $border-bright;
+  border-radius: $radius;
+  padding: 28px;
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+}
+
+// Dropzone skeleton
+.sk-ni-dropzone {
+  border: 1.5px dashed $border-bright;
+  border-radius: $radius-sm;
+  background: $bg-inset;
+  min-height: 148px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  gap: 0;
+}
+
+// Submit area
+.sk-ni-submit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+}

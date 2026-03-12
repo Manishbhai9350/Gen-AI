@@ -5,6 +5,7 @@ import { useUser } from "../../context/user/user.context";
 import axiosInstance from "../../utils/axios/axios";
 import type { Analysis, InterviewReportResponse } from "./types";
 import Navbar from "../../components/navbar/navbar";
+import Loader from "../../components/loader/loader";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const scoreColor = (score: number) => {
@@ -109,22 +110,9 @@ function Dashboard() {
       status: scoreColor(item.overallScore),
     })) || [];
 
-  if (loading) {
+if (loading) {
     return (
-      <div className="dash-root">
-        <Navbar
-          userName={user?.name}
-          userInitials={user?.name
-            .replaceAll(" ", "")
-            .split("")[0]
-            .toUpperCase()}
-        />
-        <main className="dash-main">
-          <div className="dash-container">
-            <p>Loading dashboard...</p>
-          </div>
-        </main>
-      </div>
+      <Loader variant="dashboard" />
     );
   }
 

@@ -2,18 +2,22 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import axiosInstance from "../../utils/axios/axios";
 import { useUser } from "../../context/user/user.context";
+import type { LoadingVariant } from "../loader/loader";
+import Loader from "../loader/loader";
 
 interface AuthenticatedRouteProps {
   children: React.ReactNode;
+  variant: LoadingVariant;
 }
 
-const AuthenticatedRoute = ({ children }: AuthenticatedRouteProps) => {
+const AuthenticatedRoute = ({ children, variant }: AuthenticatedRouteProps) => {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   const { setUser } = useUser();
 
   useEffect(() => {
+    let TimeOut;
     const checkAuth = async () => {
       try {
         const res = await axiosInstance.get("/auth/me");
@@ -32,15 +36,21 @@ const AuthenticatedRoute = ({ children }: AuthenticatedRouteProps) => {
       } catch (error) {
         setIsLoggedIn(false);
       } finally {
-        setLoading(false);
+        TimeOut = setTimeout(() => {
+          setLoading(false);
+        },2000)
       }
     };
 
     checkAuth();
+
+    return () => {
+      clearTimeout(TimeOut!)
+    }
   }, []);
 
   if (loading) {
-    return <div>Checking authentication...</div>;
+    return <Loader variant={variant} message="Authenticating User" />;
   }
 
   if (!isLoggedIn) {

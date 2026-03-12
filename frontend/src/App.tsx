@@ -22,7 +22,7 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <AuthenticatedRoute>
+            <AuthenticatedRoute variant="dashboard" >
               <Dashboard />
             </AuthenticatedRoute>
           }
@@ -47,7 +47,7 @@ function App() {
         <Route
           path="/interview/:id"
           element={
-            <AuthenticatedRoute>
+            <AuthenticatedRoute variant="interview">
               <InterviewPage />
             </AuthenticatedRoute>
           }
@@ -55,7 +55,7 @@ function App() {
         <Route
           path="/interview/new"
           element={
-            <AuthenticatedRoute>
+            <AuthenticatedRoute variant="new-interview">
               <NewInterviewPage />
             </AuthenticatedRoute>
           }

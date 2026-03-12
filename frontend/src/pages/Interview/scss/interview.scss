@@ -823,7 +823,7 @@ $sans: "DM Sans", sans-serif;
 
   &__fill {
     height: 100%;
-    background: linear-gradient(90deg, $accent 0%, lighten(#e8ff47, 8%) 100%);
+    background: linear-gradient(90deg, $accent 0%, rgba(232, 255, 71, 0.08) 100%);
     border-radius: 100px;
     transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -1013,7 +1013,7 @@ $sans: "DM Sans", sans-serif;
 
   &:hover:not(:disabled) {
     border-color: $border-bright;
-    background: lighten(#1e1e1c, 2%);
+    background: rgb(30, 30, 28, 0.03);
   }
 
   &--done {
