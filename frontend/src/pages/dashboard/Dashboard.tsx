@@ -334,7 +334,6 @@ function Dashboard() {
 
                     <div className="dash-analysis-card__info">
                       <p className="dash-analysis-card__role">{item.role}</p>
-                      <p className="dash-analysis-card__company">{item.company}</p>
                       <div className="dash-analysis-card__tags">
                         {item.tags.map((tag) => (
                           <span key={tag} className="dash-tag">{tag}</span>

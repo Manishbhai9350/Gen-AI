@@ -130,7 +130,7 @@ export const GetPaginatedAnalysesController = async (
     }
 
     const userId = user._id;
-    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const page = Math.max(1, parseInt((req.query.page as string) ?? "1", 10));
     const skip = (page - 1) * PER_PAGE;
 
     const [analyses, totalCount] = await Promise.all([
