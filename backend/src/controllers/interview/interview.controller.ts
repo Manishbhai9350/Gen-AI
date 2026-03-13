@@ -2,8 +2,8 @@ import type { Request, Response, NextFunction } from "express";
 import { AiReport } from "../../services/ai/ai.report.js";
 import { GetPDFText } from "../../utils/pdf.parse.js";
 import { InterviewReportModel } from "../../models/interview/interview.report.model.js";
-
-
+import { GenerateResumePDF } from "../../utils/resume.pdf.js";
+import { GenerateResumeHTML } from "../../services/ai/ai.resume.js";
 
 // ── GET /interview/report ────────────────────────────────────────────────────
 // Generates Report by Given Jobscription, userDescription and Resume
@@ -183,6 +183,67 @@ export const ToggleTaskController = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+ 
+export const GenerateResumePdfController = async (req:Request, res:Response) => {
+  const { id:reportId } = req.params;
+ 
+  try {
+    // ── 1. Fetch report ──────────────────────────────────────────────────────
+    const report = await InterviewReportModel.findById(reportId);
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+ 
+    // ── 2. Guard — all prep tasks must be completed ──────────────────────────
+    const plan = report.preparationPlan?.plan ?? [];
+    const allDone = plan.length > 0 && plan.every((d) => d.isCompleted);
+
+    if (!allDone) {
+      return res.status(403).json({
+        error: "Complete all preparation tasks before generating your resume",
+      });
+    }
+ 
+    // ── 3. Guard — resume text must exist ────────────────────────────────────
+    if (!report.resume) {
+      return res.status(400).json({
+        error: "Original resume text not found on this report",
+      });
+    }
+ 
+    // Strip accidental markdown fences if model wraps in ```html
+    const resumeHTML = await GenerateResumeHTML(report)
+ 
+    // ── 4. Generate PDF from HTML ────────────────────────────────────────────
+    const pdfBuffer = await GenerateResumePDF(resumeHTML);
+ 
+    // ── 5. Optionally persist the generated HTML on the report ───────────────
+    // await Report.findByIdAndUpdate(reportId, { generatedResumeHTML: resumeHTML });
+ 
+    // ── 6. Stream PDF to client ──────────────────────────────────────────────
+    const safeName = (report.jobDescription ?? "resume")
+      .slice(0, 40)
+      .replace(/[^a-z0-9]/gi, "_")
+      .toLowerCase();
+ 
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${safeName}_resume.pdf"`,
+      "Content-Length": pdfBuffer.length,
+    });
+ 
+    return res.end(pdfBuffer);
+  } catch (err: any) {
+    console.error("[GenerateResumePdfController]", err);
+    return res.status(500).json({
+      error: "Failed to generate resume PDF",
+      detail: err?.message,
+    });
+  }
+};
+ 
  
 // ── Helper: lock a day and all subsequent days ────────────────────────────────
 function cascadeLock(plan: any[], fromIndex: number) {

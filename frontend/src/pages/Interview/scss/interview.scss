@@ -1126,46 +1126,139 @@ $sans: "DM Sans", sans-serif;
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ADD these keyframes alongside your existing keyframes in interview.scss
+// REPLACE your existing .export-btn-container block with this one
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── New keyframes ─────────────────────────────────────────────────────────────
+
+@keyframes btn-shine {
+  0%   { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateX(320%) skewX(-20deg); opacity: 0; }
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes btn-pulse {
+  0%, 100% { box-shadow: 0 2px 16px rgba(232, 255, 71, 0.22); }
+  50%       { box-shadow: 0 4px 28px rgba(232, 255, 71, 0.45); }
+}
+
+// ── Export button container ───────────────────────────────────────────────────
 .export-btn-container {
   width: 100%;
-  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 1rem;
-  .export-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: $accent;
-    border: none;
-    border-radius: $radius-sm;
-    padding: 9px 18px;
-    font-family: $mono;
-    font-size: 11px;
-    font-weight: 700;
-    color: #1a1a18;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.18s ease;
+}
+
+// ── Export button ─────────────────────────────────────────────────────────────
+.export-btn {
+  position: relative;
+  overflow: hidden;                   // keeps the shine clipped inside the button
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: $accent;
+  border: none;
+  border-radius: $radius-sm;
+  padding: 9px 18px;
+  font-family: $mono;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a1a18;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
+  box-shadow: 0 2px 16px rgba(232, 255, 71, 0.22);
+
+  // ── Shine sweep pseudo-element ──────────────────────────────────────────────
+  &__shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 100%
+    );
+    animation: btn-shine 2.8s ease-in-out infinite;
+    animation-delay: 1s;
+    pointer-events: none;
+  }
+
+  // ── Spinner icon ────────────────────────────────────────────────────────────
+  &__spinner {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 2px solid rgba(26, 26, 24, 0.25);
+    border-top-color: #1a1a18;
+    animation: btn-spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    position: relative; // sits above the shine overlay
+    z-index: 1;
+  }
+
+  // ── Hover — only when unlocked and not loading ──────────────────────────────
+  &:hover:not(:disabled):not(.export-btn--locked):not(.export-btn--loading) {
+    background: #f0ff6b;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(232, 255, 71, 0.38);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  // ── Loading state ───────────────────────────────────────────────────────────
+  &--loading {
+    cursor: wait;
+    animation: btn-pulse 1.6s ease-in-out infinite;
+
+    // Slow the shine down while loading to feel more "working"
+    .export-btn__shine {
+      animation-duration: 1.4s;
+      animation-delay: 0s;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+      );
+    }
+  }
+
+  // ── Locked state ────────────────────────────────────────────────────────────
+  &--locked {
+    background: $bg-card;
+    border: 1px solid $border-bright;
+    color: $text-muted;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none !important;
 
     &:hover {
-      background: #f0ff6b;
-      transform: translateY(-1px);
-    }
-
-    &--locked {
       background: $bg-card;
-      border: 1px solid $border-bright;
-      color: $text-muted;
-      cursor: not-allowed;
-      transform: none !important;
-
-      &:hover {
-        background: $bg-card;
-        transform: none;
-      }
+      transform: none;
+      box-shadow: none;
     }
   }
 }

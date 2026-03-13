@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import Navbar from "../../components/navbar/navbar";
 import axiosInstance from "../../utils/axios/axios";
 import Loader from "../../components/loader/loader";
+import toast from "react-hot-toast";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface SkillGap {
@@ -315,6 +316,7 @@ const InterviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [report, setReport] = useState<Report>(DUMMY);
   const [loading, setLoading] = useState(false);
+  const [downloadingResume, setDownloadingResume] = useState(false);
   const [toggling, setToggling] = useState<string | null>(null); // taskId being toggled
   const [activeDay, setActiveDay] = useState<number>(0);
 
@@ -397,10 +399,32 @@ const InterviewPage: React.FC = () => {
     [report, id],
   );
 
+  const handleDownloadResume = useCallback(async () => {
+    if (downloadingResume) return;
+    setDownloadingResume(true);
+    try {
+      const response = await axiosInstance.post(
+        `interview/generate/resume/${id}`,
+        {},
+        { responseType: "blob" }, // treat response body as binary, not JSON
+      );
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "resume.pdf";
+      a.click();
+    } catch (error) {
+      toast.error("Failed to Generate Resume")
+    } finally {
+      setDownloadingResume(false);
+    }
+  }, [id]);
+
   if (loading) {
-    return (
-      <Loader variant="interview" />
-    );
+    return <Loader variant="interview" />;
   }
 
   const plan = report.preparationPlan?.plan ?? [];
@@ -803,18 +827,34 @@ const InterviewPage: React.FC = () => {
               );
             })()}
 
+          {/* Drop-in replacement for the export-btn-container div in InterviewPage.tsx */}
+
           <div className="export-btn-container">
             <button
-              className={`export-btn ${!allTasksDone ? "export-btn--locked" : ""}`}
-              onClick={() => {}}
-              disabled={!allTasksDone}
+              className={[
+                "export-btn",
+                !allTasksDone ? "export-btn--locked" : "",
+                downloadingResume ? "export-btn--loading" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={() => !downloadingResume && handleDownloadResume()}
+              disabled={!allTasksDone || downloadingResume}
               title={
                 !allTasksDone
-                  ? "Complete all preparation tasks to unlock PDF export"
-                  : "Export PDF"
+                  ? "Complete all preparation tasks to unlock Download Button"
+                  : downloadingResume
+                    ? "Generating your resume…"
+                    : "Download new upgraded version of your current resume"
               }
             >
-              {!allTasksDone ? (
+              {/* Shine sweep overlay — only visible when unlocked */}
+              {allTasksDone && <span className="export-btn__shine" />}
+
+              {/* Icon */}
+              {downloadingResume ? (
+                <span className="export-btn__spinner" />
+              ) : !allTasksDone ? (
                 <svg
                   width="13"
                   height="13"
@@ -840,7 +880,11 @@ const InterviewPage: React.FC = () => {
                   <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
               )}
-              Export PDF
+
+              {/* Label */}
+              <span className="export-btn__label">
+                {downloadingResume ? "Generating…" : "Download New Resume"}
+              </span>
             </button>
           </div>
         </div>

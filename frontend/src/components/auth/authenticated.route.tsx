@@ -36,9 +36,9 @@ const AuthenticatedRoute = ({ children, variant }: AuthenticatedRouteProps) => {
       } catch (error) {
         setIsLoggedIn(false);
       } finally {
-        TimeOut = setTimeout(() => {
+        // TimeOut = setTimeout(() => {
           setLoading(false);
-        },2000)
+        // },2000)
       }
     };
 
@@ -46,7 +46,7 @@ const AuthenticatedRoute = ({ children, variant }: AuthenticatedRouteProps) => {
 
     return () => {
       clearTimeout(TimeOut!)
-    }
+    } 
   }, []);
 
   if (loading) {
