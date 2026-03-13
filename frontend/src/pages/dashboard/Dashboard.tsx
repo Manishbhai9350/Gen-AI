@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./scss/dashboard.scss";
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/user/user.context";
@@ -6,6 +6,16 @@ import axiosInstance from "../../utils/axios/axios";
 import type { Analysis, InterviewReportResponse } from "./types";
 import Navbar from "../../components/navbar/navbar";
 import Loader from "../../components/loader/loader";
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  perPage: number;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const scoreColor = (score: number) => {
@@ -44,22 +54,22 @@ function Dashboard() {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // ── Paginated analyses state ───────────────────────────────────────────────
+  const [analyses, setAnalyses] = useState<Analysis[]>([]);
+  const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [analysesLoading, setAnalysesLoading] = useState(false);
+
   const navigate = useNavigate();
+  const { user } = useUser();
 
-  const { user, setUser } = useUser();
-
-  // if (user == null) {
-  //   return <Navigate to="/login" />;
-  // }
-
+  // ── Fetch dashboard stats ──────────────────────────────────────────────────
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         const res = await axiosInstance.get<InterviewReportResponse>(
           "/data/dashboard",
-          {
-            withCredentials: true,
-          },
+          { withCredentials: true }
         );
         setDashboardData(res.data.report);
       } catch (err) {
@@ -71,6 +81,36 @@ function Dashboard() {
 
     fetchDashboard();
   }, []);
+
+  // ── Fetch paginated analyses ───────────────────────────────────────────────
+  useEffect(() => {
+    const fetchAnalyses = async () => {
+      setAnalysesLoading(true);
+      try {
+        const res = await axiosInstance.get(
+          `/data/analyses?page=${currentPage}`,
+          { withCredentials: true }
+        );
+        const mapped: Analysis[] = res.data.analyses.map((item: any) => ({
+          id: item._id,
+          role: item.jobDescription?.slice(0, 40) || "Interview Analysis",
+          company: "—",
+          score: item.overallScore,
+          date: new Date(item.createdAt).toLocaleDateString(),
+          tags: item.skillGaps?.slice(0, 3).map((g: any) => g.skill) || [],
+          status: scoreColor(item.overallScore),
+        }));
+        setAnalyses(mapped);
+        setPagination(res.data.pagination);
+      } catch (err) {
+        console.error("Analyses fetch failed", err);
+      } finally {
+        setAnalysesLoading(false);
+      }
+    };
+
+    fetchAnalyses();
+  }, [currentPage]);
 
   const stats = dashboardData
     ? [
@@ -99,21 +139,8 @@ function Dashboard() {
       ]
     : [];
 
-  const analyses: Analysis[] =
-    dashboardData?.recentAnalysis?.map((item: any) => ({
-      id: item._id,
-      role: "Frontend Engineer", // you can parse this later
-      company: "Company", // optional improvement later
-      score: item.overallScore,
-      date: new Date(item.createdAt).toLocaleDateString(),
-      tags: item.technicalQuestions?.[0]?.tags || [],
-      status: scoreColor(item.overallScore),
-    })) || [];
-
-if (loading) {
-    return (
-      <Loader variant="dashboard" />
-    );
+  if (loading) {
+    return <Loader variant="dashboard" />;
   }
 
   return (
@@ -124,12 +151,11 @@ if (loading) {
       />
 
       <main className="dash-main">
-        {/* Background glows */}
         <div className="dash-glow dash-glow--top" />
         <div className="dash-glow dash-glow--right" />
 
         <div className="dash-container">
-          {/* ── Hero greeting + CTA ── */}
+          {/* ── Hero ── */}
           <section className="dash-hero">
             <div className="dash-hero__text">
               <p className="dash-hero__eyebrow">
@@ -165,7 +191,7 @@ if (loading) {
             </button>
           </section>
 
-          {/* ── Stats row ── */}
+          {/* ── Stats ── */}
           <section className="dash-stats">
             {stats.map((stat, i) => (
               <div
@@ -185,30 +211,91 @@ if (loading) {
             ))}
           </section>
 
-          {/* ── Recent analyses ── */}
+          {/* ── Analyses ── */}
           <section className="dash-recent">
             <div className="dash-recent__header">
-              <h2 className="dash-recent__title">Recent Analyses</h2>
-              <button
-                className="dash-recent__see-all"
-                onClick={() => navigate("/interviews")}
-              >
-                See all
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </button>
+              <div className="dash-recent__header-left">
+                <h2 className="dash-recent__title">Recent Analyses</h2>
+                {pagination && (
+                  <span className="dash-recent__count">
+                    {pagination.totalCount} total
+                  </span>
+                )}
+              </div>
+
+              {/* Pagination controls */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="dash-pagination">
+                  <button
+                    className="dash-pagination__btn"
+                    onClick={() => setCurrentPage((p) => p - 1)}
+                    disabled={!pagination.hasPrevPage || analysesLoading}
+                    aria-label="Previous page"
+                  >
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    >
+                      <line x1="19" y1="12" x2="5" y2="12" />
+                      <polyline points="12 19 5 12 12 5" />
+                    </svg>
+                  </button>
+
+                  <span className="dash-pagination__info">
+                    {pagination.currentPage}
+                    <span className="dash-pagination__sep">/</span>
+                    {pagination.totalPages}
+                  </span>
+
+                  <button
+                    className="dash-pagination__btn"
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                    disabled={!pagination.hasNextPage || analysesLoading}
+                    aria-label="Next page"
+                  >
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    >
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
 
-            {analyses.length === 0 ? (
+            {/* List */}
+            {analysesLoading ? (
+              <div className="dash-analyses-loading">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="dash-analysis-card-skel" style={{ animationDelay: `${i * 0.06}s` }}>
+                    <div className="skel skel--circle" />
+                    <div className="dash-analysis-card-skel__info">
+                      <div className="skel skel--line skel--w60" />
+                      <div className="skel skel--line skel--w40" style={{ marginTop: 6 }} />
+                      <div className="dash-analysis-card-skel__tags">
+                        <div className="skel skel--pill" />
+                        <div className="skel skel--pill" />
+                        <div className="skel skel--pill" />
+                      </div>
+                    </div>
+                    <div className="dash-analysis-card-skel__meta">
+                      <div className="skel skel--line skel--w50" />
+                      <div className="skel skel--pill" style={{ marginTop: 8 }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : analyses.length === 0 ? (
               <div className="dash-empty">
                 <div className="dash-empty__icon">
                   <svg
@@ -240,33 +327,26 @@ if (loading) {
                   <div
                     key={item.id}
                     className="dash-analysis-card"
-                    style={{ animationDelay: `${0.1 + i * 0.07}s` }}
+                    style={{ animationDelay: `${i * 0.07}s` }}
                     onClick={() => navigate(`/interview/${item.id}`)}
                   >
-                    {/* Score ring */}
                     <ScoreRing score={item.score} />
 
-                    {/* Info */}
                     <div className="dash-analysis-card__info">
                       <p className="dash-analysis-card__role">{item.role}</p>
-                      <p className="dash-analysis-card__company">
-                        {item.company}
-                      </p>
+                      <p className="dash-analysis-card__company">{item.company}</p>
                       <div className="dash-analysis-card__tags">
                         {item.tags.map((tag) => (
-                          <span key={tag} className="dash-tag">
-                            {tag}
-                          </span>
+                          <span key={tag} className="dash-tag">{tag}</span>
                         ))}
                       </div>
                     </div>
 
-                    {/* Meta + arrow */}
                     <div className="dash-analysis-card__meta">
                       <p className="dash-analysis-card__date">{item.date}</p>
                       <span className={`dash-badge dash-badge--${item.status}`}>
                         {item.status === "high"
-                          ? "High"
+                          ? "Strong"
                           : item.status === "medium"
                             ? "Good"
                             : "Fair"}
@@ -291,23 +371,6 @@ if (loading) {
               </div>
             )}
           </section>
-
-          {/* ── Usage bar ── */}
-          {/* <section className="dash-usage">
-            <div className="dash-usage__header">
-              <span className="dash-usage__label">Monthly Usage</span>
-              <span className="dash-usage__count">
-                12 <span className="dash-usage__total">/ 20 analyses</span>
-              </span>
-            </div>
-            <div className="dash-usage__track">
-              <div className="dash-usage__fill" style={{ width: "60%" }} />
-            </div>
-            <p className="dash-usage__note">
-              8 analyses remaining ·{" "}
-              <button className="dash-usage__upgrade">Upgrade to Pro</button>
-            </p>
-          </section> */}
         </div>
       </main>
     </div>

@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { AuthMiddleware, BlackListMiddleware } from "../../middlewares/auth.middleware.js";
-import { GetDashboardDataController } from "../../controllers/data/user.data.controller.js";
+import { GetDashboardDataController, GetPaginatedAnalysesController } from "../../controllers/data/user.data.controller.js";
 
 const router = Router();
 
 
 
-router.get('/dashboard',BlackListMiddleware,AuthMiddleware,GetDashboardDataController);
-router.get('/interview/:id',BlackListMiddleware,AuthMiddleware,GetDashboardDataController);
+router.get('/dashboard',GetDashboardDataController);
+router.get('/interview/:id',GetDashboardDataController);
+router.get('/analyses',GetPaginatedAnalysesController);
 
 
 export { router as UserDataRouter };

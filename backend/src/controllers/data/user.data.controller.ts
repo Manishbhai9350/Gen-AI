@@ -9,7 +9,12 @@ export const GetDashboardDataController = async (
 ) => {
   try {
     const { user } = req as Request & {
-      user: { _id: ObjectId; username: string; email: string; password: string };
+      user: {
+        _id: ObjectId;
+        username: string;
+        email: string;
+        password: string;
+      };
     };
 
     if (!user) {
@@ -24,7 +29,7 @@ export const GetDashboardDataController = async (
     /* ---------------- TOTAL ANALYSIS ---------------- */
 
     const totalAnalysis = await InterviewReportModel.countDocuments({
-      user:userId
+      user: userId,
     });
 
     /* ---------------- THIS WEEK ANALYSIS ---------------- */
@@ -33,14 +38,14 @@ export const GetDashboardDataController = async (
     startOfWeek.setDate(startOfWeek.getDate() - 7);
 
     const analysisThisWeek = await InterviewReportModel.countDocuments({
-      user:userId,
+      user: userId,
       createdAt: { $gte: startOfWeek },
     });
 
     /* ---------------- AVERAGE SCORE ---------------- */
 
     const avgScoreResult = await InterviewReportModel.aggregate([
-      { $match: { user:userId } },
+      { $match: { user: userId } },
       {
         $group: {
           _id: null,
@@ -54,13 +59,13 @@ export const GetDashboardDataController = async (
 
     /* ---------------- TOP MATCH ---------------- */
 
-    const topMatch = await InterviewReportModel.findOne({ user:userId })
+    const topMatch = await InterviewReportModel.findOne({ user: userId })
       .sort({ overallScore: -1 })
       .limit(1);
 
     /* ---------------- RECENT ANALYSIS ---------------- */
 
-    const recentAnalysis = await InterviewReportModel.find({ user:userId })
+    const recentAnalysis = await InterviewReportModel.find({ user: userId })
       .sort({ createdAt: -1 })
       .limit(5);
 
@@ -78,5 +83,82 @@ export const GetDashboardDataController = async (
     });
   } catch (error) {
     next(error);
+  }
+};
+
+/**
+ * GetUserAnalysesController
+ * Returns paginated interview analyses for the currently authenticated user.
+ *
+ * GET /interview/analyses?page=1
+ *
+ * Response:
+ * {
+ *   analyses: [...],
+ *   pagination: {
+ *     currentPage: 1,
+ *     totalPages: 4,
+ *     totalCount: 18,
+ *     hasNextPage: true,
+ *     hasPrevPage: false,
+ *     perPage: 5
+ *   }
+ * }
+ */
+
+const PER_PAGE = 5;
+
+export const GetPaginatedAnalysesController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { user } = req as Request & {
+      user: {
+        _id: ObjectId;
+        username: string;
+        email: string;
+        password: string;
+      };
+    };
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const userId = user._id;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const skip = (page - 1) * PER_PAGE;
+
+    const [analyses, totalCount] = await Promise.all([
+      InterviewReportModel.find({ user: userId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(PER_PAGE)
+        .select(
+          "_id overallScore sectionScores jobDescription createdAt skillGaps strengths preparationPlan",
+        ),
+      InterviewReportModel.countDocuments({ user: userId }),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / PER_PAGE);
+
+    return res.status(200).json({
+      analyses,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        perPage: PER_PAGE,
+      },
+    });
+  } catch (err) {
+    console.error("[GetUserAnalysesController]", err);
+    return res.status(500).json({ error: "Failed to fetch analyses" });
   }
 };

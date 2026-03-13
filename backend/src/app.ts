@@ -35,7 +35,7 @@ app.use(errorHandler);
 
 app.use("/auth", AuthRouter);
 app.use("/interview", BlackListMiddleware, AuthMiddleware, InterviewRouter);
-app.use("/data", UserDataRouter);
+app.use("/data",BlackListMiddleware,AuthMiddleware, UserDataRouter);
 
 const gateway = createGateway({
   apiKey: process.env.AI_GATEWAY_API_KEY!,
