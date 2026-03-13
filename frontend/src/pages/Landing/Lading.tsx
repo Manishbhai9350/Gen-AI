@@ -567,20 +567,6 @@ const Landing = () => {
               </svg>
               Analyze My Resume — Free
             </Link>
-            <a href="#how" className="hero__ghost">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
-              </svg>
-              See How It Works
-            </a>
           </div>
           <div className="hero__proof">
             <div className="proof-avatars">
@@ -757,7 +743,7 @@ const Landing = () => {
       </section>
 
       {/* ── PRICING ── */}
-      <section className="section pricing-section" id="pricing">
+      {/* <section className="section pricing-section" id="pricing">
         <div className="container">
           <div className="reveal" style={{ textAlign: "center" }}>
             <div className="eyebrow eyebrow--center">Pricing</div>
@@ -771,7 +757,6 @@ const Landing = () => {
             className="pricing-grid reveal"
             style={{ transitionDelay: "0.1s" }}
           >
-            {/* Starter */}
             <div className="price-card">
               <div className="price-plan">Starter</div>
               <div className="price-amount">
@@ -798,7 +783,6 @@ const Landing = () => {
                 Get Started Free
               </Link>
             </div>
-            {/* Pro */}
             <div className="price-card price-card--hot">
               <div className="price-hot-badge">Most Popular</div>
               <div className="price-plan">Pro</div>
@@ -832,7 +816,6 @@ const Landing = () => {
                 Start Pro — ₹299/mo
               </Link>
             </div>
-            {/* Teams */}
             <div className="price-card">
               <div className="price-plan">Teams</div>
               <div className="price-amount">
@@ -867,7 +850,7 @@ const Landing = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── CTA ── */}
       <section className="cta-section">
@@ -911,14 +894,14 @@ const Landing = () => {
           </span>
         </div>
         <ul className="lfooter__links">
-          <li>
+          {/* <li>
             <a href="#">Privacy</a>
           </li>
           <li>
             <a href="#">Terms</a>
-          </li>
+          </li> */}
           <li>
-            <a href="#">Contact</a>
+            <a target="_blank" href="mailto:developermanish93@gmail.com">Contact</a>
           </li>
         </ul>
       </footer>
